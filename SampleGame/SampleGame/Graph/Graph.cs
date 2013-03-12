@@ -10,15 +10,24 @@ namespace SampleGame
 {
     class Graph
     {
+        bool displayGraph;
         public List<Node> nodeList = new List<Node>();
+
+        const int GRID_SIZE = 50;
 
         public Graph()
         {
-            nodeList.Add(new Node(new Vector2(300,300)));
+
         }
 
         public virtual void Update(GameTime gametime)
         {
+            
+        }
+
+        public void addNode(Vector2 nodePosition)
+        {
+            nodeList.Add(new Node(nodePosition));
         }
 
         public virtual void Draw(SpriteBatch sprites, SpriteFont font1)

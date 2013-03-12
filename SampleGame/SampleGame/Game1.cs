@@ -24,14 +24,16 @@ namespace SampleGame
         MouseState mouseStatePrevious;                          // the previous state of the mouse
         SpriteFont font1;                                       // default font (used for debug)
         BaseGameEntity crosshair;                               // crosshair for movement    
-        bool displayDebugInfo = true;                          // flag for debug information
+        bool displayDebugInfo = true;                           // flag for debug information
         bool displayGrid = true;                                // flag for grid
         List<Node> nodeList = new List<Node>();
         List<BaseGameEntity> waypoints = new List<BaseGameEntity>();
+        Graph navagationGraph;
+        const int CELL_SIZE = 50;                               // the size of each cell in the grid (X by X)
 
         int windowWidth = 0;                                    // width of the window
         int windowHeight = 0;                                   // height of the window
-        Graph g = new Graph();
+
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -62,6 +64,7 @@ namespace SampleGame
             player.InitializeSensors();                                         // initializes all sensors for the player object
 
             crosshair = new BaseGameEntity();
+            crosshair.Position = new Vector2(windowWidth / 2+1, windowHeight / 2+1); // TODO - slight offset to temporarly bypass a bug
 
             // ************ CREATING THE WALLS FOR THE ASSIGNMENT ********* //
 
@@ -76,6 +79,23 @@ namespace SampleGame
             }
 
             // ********** END CREATING THE WALLS FOR THE ASSIGNMENT ******* //
+
+            // create the navagation graph
+            navagationGraph = new Graph();
+
+            for (int i = 0; i < windowHeight / CELL_SIZE; i++)
+            {
+                for (int j = 0; j < windowWidth / CELL_SIZE; j++)
+                {
+                    navagationGraph.addNode(new Vector2(j * CELL_SIZE + CELL_SIZE / 2, i * CELL_SIZE + CELL_SIZE / 2));
+                }
+            }
+
+            // start at cell size to avoid overlap on first case
+            for (int i = CELL_SIZE; i < windowHeight / CELL_SIZE; i++)
+            {
+                navagationGraph.addNode(new Vector2(i * CELL_SIZE, 0));
+            }
 
             base.Initialize();
         }
@@ -92,6 +112,11 @@ namespace SampleGame
             font1 = Content.Load<SpriteFont>("fonts/Font1");
 
             crosshair.LoadContent(this.Content, "Images\\crosshair");
+
+            foreach (Node node in navagationGraph.nodeList)
+            {
+                node.LoadContent(this.Content, "Images\\waypoint");
+            }
 
             // ************ WAYPOINT LIST ************ //
 
@@ -223,39 +248,42 @@ namespace SampleGame
         {
             GraphicsDevice.Clear(Color.DarkBlue);       // clears background to selected color
             Color alphaBlack = Color.Black;
-            alphaBlack.A = 240;
+            alphaBlack.A = 200;
 
             spriteBatch.Begin();                        // begin drawing sprites
 
-
-            foreach (Node node in g.nodeList)
+            // Draw the navagation graph and grid
+            if (displayGrid)
             {
-                node.Draw(this.spriteBatch, font1);
+                foreach (Node node in navagationGraph.nodeList)
+                {
+                    node.Draw(this.spriteBatch, font1);
+                }
             }
 
             // draw the grid
-            if (displayGrid)
-            {
-                int gridSpacing = 50;                       // used for size of grid (X by X)
+            //if (displayGrid)
+            //{
+            //    int gridSpacing = 50;                       // used for size of grid (X by X)
 
-                // draw the vertical lines
-                for (int i = 0; i < windowWidth / gridSpacing; i++)
-                {
-                    DrawingHelper.DrawFastLine(new Vector2(i * gridSpacing, i), new Vector2(i * gridSpacing, i * gridSpacing + windowHeight), Color.Gray);
-                }
+            //     draw the vertical lines
+            //    for (int i = 0; i < windowWidth / CELL_SIZE; i++)
+            //    {
+            //        DrawingHelper.DrawFastLine(new Vector2(i * CELL_SIZE, i), new Vector2(i * CELL_SIZE, i * CELL_SIZE + windowHeight), Color.Gray);
+            //    }
 
-                // draw the horizontal lines
-                for (int i = 0; i < windowHeight / gridSpacing; i++)
-                {
-                    DrawingHelper.DrawFastLine(new Vector2(i, i * gridSpacing), new Vector2(i * gridSpacing + windowWidth, i * gridSpacing), Color.Gray);
-                }
+            //    // draw the horizontal lines
+            //    for (int i = 0; i < windowHeight / CELL_SIZE; i++)
+            //    {
+            //        DrawingHelper.DrawFastLine(new Vector2(i, i * CELL_SIZE), new Vector2(i * CELL_SIZE + windowWidth, i * CELL_SIZE), Color.Gray);
+            //    }
 
-                // draw each waypoint
-                foreach (BaseGameEntity waypoint in waypoints)
-                {
-                    // TODO - waypoint.Draw(this.spriteBatch, font1);
-                }
-            }
+            //    // draw each waypoint
+            //    foreach (BaseGameEntity waypoint in waypoints)
+            //    {
+            //        // TODO - waypoint.Draw(this.spriteBatch, font1);
+            //    }
+            //}
 
             // Draw each agent
             foreach (GameAgent agent in agentAIList)
@@ -283,6 +311,7 @@ namespace SampleGame
 
             spriteBatch.End();                          // stop drawing sprites
 
+            // Draw debugging and info on top of everything else
             spriteBatch.Begin();
 
             DrawingHelper.DrawRectangle(new Rectangle(windowWidth / 2 - 105, windowHeight - 45, 232, 45), alphaBlack, true);
@@ -291,7 +320,6 @@ namespace SampleGame
 
             if (displayDebugInfo)
             {
-                alphaBlack.A = 200;
                 DrawingHelper.DrawRectangle(new Rectangle(15, 15, 275, 50), alphaBlack, true);
 
                 spriteBatch.DrawString(font1, "Player Pos: " + player.Position.X + ", " + player.Position.Y, new Vector2(20, 20), Color.White, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 1);

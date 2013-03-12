@@ -12,10 +12,10 @@ namespace SampleGame
         public Vector2 Velocity;     // vector for objects velocity
         public Vector2 Heading;      // extends out from the front of the object
         public Vector2 Side;         // perpendicular to the heading vector
-        public float Mass;          // mass of the object
-        public float MaxSpeed;      // top speed the object can reach
-        public float MaxForce;      // the maximum force of the object
-        public float MaxTurnRate;   // caps off the rate an object can rotate
+        public float Mass;           // mass of the object
+        public float MaxSpeed;       // top speed the object can reach
+        public float MaxForce;       // the maximum force of the object
+        public float MaxTurnRate;    // caps off the rate an object can rotate
 
         public MovingEntity()
         {
