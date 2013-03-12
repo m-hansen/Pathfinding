@@ -26,8 +26,8 @@ namespace SampleGame
         BaseGameEntity crosshair;                               // crosshair for movement    
         bool displayDebugInfo = true;                           // flag for debug information
         bool displayGrid = true;                                // flag for grid
-        List<Node> nodeList = new List<Node>();
-        List<BaseGameEntity> waypoints = new List<BaseGameEntity>();
+        //List<BaseGameEntity> waypoints = new List<BaseGameEntity>();
+        List<Wall> wallList = new List<Wall>();
         Graph navagationGraph;
         const int CELL_SIZE = 50;                               // the size of each cell in the grid (X by X)
 
@@ -68,7 +68,7 @@ namespace SampleGame
 
             // ************ CREATING THE WALLS FOR THE ASSIGNMENT ********* //
 
-            int defaultWalls = 3;
+            /*int defaultWalls = 3;
 
             for (int i = 0; i < defaultWalls; i++)
             {
@@ -76,7 +76,7 @@ namespace SampleGame
                 {
                     Type = (int)Enums.AgentType.Wall
                 });
-            }
+            }*/
 
             // ********** END CREATING THE WALLS FOR THE ASSIGNMENT ******* //
 
@@ -113,49 +113,49 @@ namespace SampleGame
 
             crosshair.LoadContent(this.Content, "Images\\crosshair");
 
-            foreach (Node node in navagationGraph.nodeList)
+            foreach (Node node in navagationGraph.NodeList)
             {
                 node.LoadContent(this.Content, "Images\\waypoint");
             }
 
             // ************ WAYPOINT LIST ************ //
 
-            int hWaypoints = 18;
-            int vWaypoints = 14;
+            //int hWaypoints = 18;
+            //int vWaypoints = 14;
 
-            for (int i = 0; i < hWaypoints; i++)
-            {
-                for (int j = 0; j < vWaypoints; j++)
-                {
-                    waypoints.Add(new BaseGameEntity()
-                    {
-                        Position = new Vector2(i * 50 + 25, j * 50 + 25),
-                    });
-                }
-            }
+            //for (int i = 0; i < hWaypoints; i++)
+            //{
+            //    for (int j = 0; j < vWaypoints; j++)
+            //    {
+            //        waypoints.Add(new BaseGameEntity()
+            //        {
+            //            //Position = new Vector2(i * 50 + 25, j * 50 + 25),
+            //        });
+            //    }
+            //}
 
-            foreach (BaseGameEntity waypoint in waypoints)
-            {
-                waypoint.LoadContent(this.Content, "Images\\waypoint");
-            }
+            //foreach (BaseGameEntity waypoint in waypoints)
+            //{
+            //    //waypoint.LoadContent(this.Content, "Images\\waypoint");
+            //}
 
             // ************ END WAYPOINT LIST ************ //
 
             // ************ LOADING THE WALLS FOR THE ASSIGNMENT ********* //
 
-            agentAIList[0].LoadContent(this.Content, "Images\\wall");
-            agentAIList[1].LoadContent(this.Content, "Images\\wall");
-            agentAIList[2].LoadContent(this.Content, "Images\\wall");
+            //agentAIList[0].LoadContent(this.Content, "Images\\wall");
+            //agentAIList[1].LoadContent(this.Content, "Images\\wall");
+            //agentAIList[2].LoadContent(this.Content, "Images\\wall");
 
-            agentAIList[0].Rotation = MathHelper.PiOver2;
+            //agentAIList[0].Rotation = MathHelper.PiOver2;
 
-            agentAIList[0].Scale = 1;
-            agentAIList[1].Scale = 1;
-            agentAIList[2].Scale = 1;
+            //agentAIList[0].Scale = 1;
+            //agentAIList[1].Scale = 1;
+            //agentAIList[2].Scale = 1;
 
-            agentAIList[0].Position = new Vector2(325, 350);
-            agentAIList[1].Position = new Vector2(650, 325);
-            agentAIList[2].Position = new Vector2(350, 525);
+            //agentAIList[0].Position = new Vector2(325, 350);
+            //agentAIList[1].Position = new Vector2(650, 325);
+            //agentAIList[2].Position = new Vector2(350, 525);
 
             //Random rnd = new Random();
 
@@ -210,7 +210,13 @@ namespace SampleGame
             mouseStatePrevious = mouseStateCurrent;
             mouseStateCurrent = Mouse.GetState();
 
+
             player.Update(gameTime, keyboardStateCurrent, keyboardStatePrevious, mouseStateCurrent, mouseStatePrevious, agentAIList, crosshair, windowWidth, windowHeight);
+
+            foreach (Node node in navagationGraph.NodeList)
+            {
+                node.Update(gameTime, player);
+            }
 
             // check for debug/grid/etc
             if ((keyboardStateCurrent.IsKeyUp(Keys.F3) && keyboardStatePrevious.IsKeyDown(Keys.F3)))
@@ -232,7 +238,13 @@ namespace SampleGame
                 // Create a new node
                 Node node = new Node(new Vector2(mouseStateCurrent.X, mouseStateCurrent.Y));
                 node.LoadContent(this.Content, "Images\\waypoint");
-                nodeList.Add(node);
+                navagationGraph.NodeList.Add(node);
+
+                // Create a wall
+                //Wall wall = new Wall();
+                //wall.LoadContent(this.Content, "Images\\wall");
+                //wall.Position = new Vector2(mouseStateCurrent.X, mouseStateCurrent.Y);
+                //wallList.Add(wall);
             }
 
             // Place crosshair at mouse position
@@ -255,7 +267,7 @@ namespace SampleGame
             // Draw the navagation graph and grid
             if (displayGrid)
             {
-                foreach (Node node in navagationGraph.nodeList)
+                foreach (Node node in navagationGraph.NodeList)
                 {
                     node.Draw(this.spriteBatch, font1);
                 }
@@ -285,16 +297,25 @@ namespace SampleGame
             //    }
             //}
 
-            // Draw each agent
+
+
+            // Draw walls, waypoints, and agents
+            foreach (Wall wall in wallList)
+            {
+                wall.Draw(this.spriteBatch, font1);
+            }
+            
+            foreach (Node node in navagationGraph.NodeList)
+            {
+                node.Draw(this.spriteBatch, font1);
+            }
+
             foreach (GameAgent agent in agentAIList)
             {
                 agent.Draw(this.spriteBatch, font1);
             }
 
-            foreach (Node node in nodeList)
-            {
-                node.Draw(this.spriteBatch, font1);
-            }
+   
 
             crosshair.Draw(this.spriteBatch, font1);    // draw the crosshair
 
@@ -320,10 +341,11 @@ namespace SampleGame
 
             if (displayDebugInfo)
             {
-                DrawingHelper.DrawRectangle(new Rectangle(15, 15, 275, 50), alphaBlack, true);
+                DrawingHelper.DrawRectangle(new Rectangle(15, 15, 275, 70), alphaBlack, true);
 
                 spriteBatch.DrawString(font1, "Player Pos: " + player.Position.X + ", " + player.Position.Y, new Vector2(20, 20), Color.White, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 1);
                 spriteBatch.DrawString(font1, "Player Heading: " + player.Heading.X + ", " + player.Heading.Y, new Vector2(20, 40), Color.White, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 1);
+                spriteBatch.DrawString(font1, "Current Cell: UNKNOWN " + CELL_SIZE, new Vector2(20, 60), Color.White, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 1);
             }
 
             spriteBatch.End();

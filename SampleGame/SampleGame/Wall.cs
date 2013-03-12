@@ -13,11 +13,12 @@ namespace SampleGame
     {
         public Wall()
         {
+            Bounds = new Rectangle();
         }
 
-        public virtual void Draw(SpriteBatch sprites, SpriteFont font1)
+        public virtual void Update(GameTime gametime)
         {
-
+            Bounds = new Rectangle((int)Position.X, (int)Position.Y, Texture.Width / 2, Texture.Height / 2);
         }
     }
 }

@@ -10,10 +10,7 @@ namespace SampleGame
 {
     class Graph
     {
-        bool displayGraph;
-        public List<Node> nodeList = new List<Node>();
-
-        const int GRID_SIZE = 50;
+        public List<Node> NodeList = new List<Node>();
 
         public Graph()
         {
@@ -27,12 +24,12 @@ namespace SampleGame
 
         public void addNode(Vector2 nodePosition)
         {
-            nodeList.Add(new Node(nodePosition));
+            NodeList.Add(new Node(nodePosition));
         }
 
         public virtual void Draw(SpriteBatch sprites, SpriteFont font1)
         {
-            foreach (Node node in nodeList)
+            foreach (Node node in NodeList)
             {
                 sprites.Draw(node.Texture, node.Position - node.Origin, Color.White);
                 sprites.DrawString(font1, "Node ID: " + node.id, new Vector2(200, 200), Color.White);

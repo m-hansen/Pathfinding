@@ -37,6 +37,8 @@ namespace SampleGame
 
             // setting the origin to the center of the object
             Origin = new Vector2(Texture.Width / 2, Texture.Height / 2);
+            
+            Bounds = new Rectangle((int)(Position.X - Origin.X * Scale), (int)(Position.Y - Origin.Y * Scale), (int)(Texture.Width * Scale), (int)(Texture.Height * Scale));
         }
 
         public virtual void Update(GameTime gametime)

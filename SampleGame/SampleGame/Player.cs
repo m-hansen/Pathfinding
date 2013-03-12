@@ -207,6 +207,7 @@ namespace SampleGame
                 sensor.Draw(sprites, this.Position, font1);
             }
 
+            DrawingHelper.DrawRectangle(Bounds, Color.Red, false);
             //DrawingHelper.DrawFastLine(Position, Heading, Color.Yellow); // debug heading
 
             base.Draw(sprites, font1);

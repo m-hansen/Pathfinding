@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using Drawing;
 
 namespace SampleGame
@@ -17,6 +18,7 @@ namespace SampleGame
         List<Node> adjacentNodes = new List<Node>();
         Rectangle cell;                     // the bounding rectangle
         Vector2 waypoint;                   // the origin/waypoint in the cell/node
+        public bool Active = true;          // flag to determine whether the node is reachable or not (ie: is it a waypoint or a wall?)
 
         public Node(Vector2 pos)
         {
@@ -35,15 +37,25 @@ namespace SampleGame
         //    Origin = new Vector2(Texture.Width / 2, Texture.Height / 2);
         //}
 
-        public virtual void Update(GameTime gametime)
+        public virtual void Update(GameTime gametime, Player player)
         {
-            //waypoint = new Vector2(Position.X + Texture.Width, Position.Y + Texture.Height);
+            Color = cell.Contains(new Point((int)player.Position.X, (int)player.Position.Y)) ? Color.Green : Color.LightGray;
+
+            // if active add waypoint else add wall - set states?
+            //Texture = Active ? LoadContent(contentManager, "Images\\waypoint") : LoadContent(contentManager, "Images\\wall");
+        }
+
+        public bool doesCellContainPlayer(Player player)
+        {
+            if (cell.Contains(new Point((int)player.Position.X, (int)player.Position.Y)))
+                return true;
+            return false;
         }
 
         public virtual void Draw(SpriteBatch sprites, SpriteFont font1)
         {
             DrawingHelper.DrawRectangle(cell, Color.Gray, false);
-            sprites.Draw(Texture, waypoint - Origin, Color.LightGray);
+            sprites.Draw(Texture, waypoint - Origin, Color);
         }
     }
 }
