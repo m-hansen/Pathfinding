@@ -14,10 +14,9 @@ namespace SampleGame
     {
         public int id = -1;                             // the id for each node
         static int nextID = 0;                          // keeps track of the next avaliable id
-        List<Node> adjacentNodes = new List<Node>();    // list of adjacent nodes
+        public List<Node> AdjacentNodes = new List<Node>();    // list of adjacent nodes
         public Rectangle Cell;                          // the bounding rectangle
         public bool Active = true;                      // flag to determine whether the node is reachable or not (ie: is it a waypoint or a wall?)
-
         Rectangle adjacentNodeBounds;
         const int cellSize = 50;
 
@@ -51,12 +50,6 @@ namespace SampleGame
                 // if it does contain a wall, set to inactive
                 if (Cell.Contains(new Point((int)wall.Position.X, (int)wall.Position.Y)))
                     Active = false;
-            }
-
-            // Check for adjacent nodes
-            if (Active)
-            {
-                
             }
         }
 

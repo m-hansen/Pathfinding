@@ -228,6 +228,8 @@ namespace SampleGame
                 node.Update(gameTime, player, crosshair, wallList);
             }
 
+            navagationGraph.Update(gameTime, player, crosshair);
+
             // check for debug/grid/etc
             if ((keyboardStateCurrent.IsKeyUp(Keys.F3) && keyboardStatePrevious.IsKeyDown(Keys.F3)))
                 displayDebugInfo = !displayDebugInfo;
@@ -318,7 +320,7 @@ namespace SampleGame
             // *********************** END DRAWING TEXT ON THE SCREEN FOR ASSIGNMENT ***************** //
 
             player.Draw(this.spriteBatch, font1);       // draws the player object on the screen
-
+            navagationGraph.Draw(this.spriteBatch, font1);
             spriteBatch.End();                          // stop drawing sprites
 
             // Draw debugging and info on top of everything else
