@@ -260,6 +260,9 @@ namespace SampleGame
                         Wall wall = new Wall();
                         wall.LoadContent(this.Content, "Images\\wall");
                         wall.Position = node.Position;
+                        wall.Bounds = new Rectangle(
+                            (int)(wall.Position.X - wall.Origin.X * wall.Scale), (int)(wall.Position.Y - wall.Origin.Y * wall.Scale),
+                            (int)(wall.Texture.Width), (int)(wall.Texture.Height));
                         wallList.Add(wall);
                     }
                 }
