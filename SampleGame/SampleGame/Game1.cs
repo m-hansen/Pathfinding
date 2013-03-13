@@ -26,9 +26,8 @@ namespace SampleGame
         BaseGameEntity crosshair;                               // crosshair for movement    
         bool displayDebugInfo = true;                           // flag for debug information
         bool displayGrid = true;                                // flag for grid
-        //List<BaseGameEntity> waypoints = new List<BaseGameEntity>();
-        List<Wall> wallList = new List<Wall>();
-        Graph navagationGraph;
+        List<Wall> wallList = new List<Wall>();                 // list of walls in the world
+        Graph navagationGraph;                                  // the navagation graph for the world
         const int CELL_SIZE = 50;                               // the size of each cell in the grid (X by X)
 
         int windowWidth = 0;                                    // width of the window
@@ -118,28 +117,38 @@ namespace SampleGame
                 node.LoadContent(this.Content, "Images\\waypoint");
             }
 
-            // ************ WAYPOINT LIST ************ //
 
-            //int hWaypoints = 18;
-            //int vWaypoints = 14;
+            // *********************** MAP GENERATION *********************** //
 
-            //for (int i = 0; i < hWaypoints; i++)
-            //{
-            //    for (int j = 0; j < vWaypoints; j++)
-            //    {
-            //        waypoints.Add(new BaseGameEntity()
-            //        {
-            //            //Position = new Vector2(i * 50 + 25, j * 50 + 25),
-            //        });
-            //    }
-            //}
+            // add static walls
+            List<int> wallNodes = new List<int>();
+            for (int i = 52; i <= 63; i++)
+                wallNodes.Add(i);
+            for (int i = 73; i <= 121; i += 16)
+                wallNodes.Add(i);
+            for (int i = 132; i <= 180; i += 16)
+                wallNodes.Add(i);
 
-            //foreach (BaseGameEntity waypoint in waypoints)
-            //{
-            //    //waypoint.LoadContent(this.Content, "Images\\waypoint");
-            //}
+            // iterate through each node and check to see if its on the static list of walls
+            foreach (Node node in navagationGraph.NodeList)
+            {
+                foreach (int id in wallNodes)
+                {
+                    if (node.id == id)
+                    {
+                        Wall wall = new Wall();
+                        wall.LoadContent(this.Content, "Images\\wall");
+                        wall.Position = node.Position;
+                        wall.Bounds = new Rectangle(
+                            (int)(wall.Position.X - wall.Origin.X * wall.Scale), (int)(wall.Position.Y - wall.Origin.Y * wall.Scale), 
+                            (int)(wall.Texture.Width), (int)(wall.Texture.Height));
+                        wallList.Add(wall);
+                    }
+                }
+            }
 
-            // ************ END WAYPOINT LIST ************ //
+            // *********************** END MAP GENERATION *********************** //
+
 
             // ************ LOADING THE WALLS FOR THE ASSIGNMENT ********* //
 
@@ -210,12 +219,13 @@ namespace SampleGame
             mouseStatePrevious = mouseStateCurrent;
             mouseStateCurrent = Mouse.GetState();
 
+            // Update the player
+            player.Update(gameTime, keyboardStateCurrent, keyboardStatePrevious, mouseStateCurrent, mouseStatePrevious, wallList, agentAIList, crosshair, windowWidth, windowHeight);
 
-            player.Update(gameTime, keyboardStateCurrent, keyboardStatePrevious, mouseStateCurrent, mouseStatePrevious, agentAIList, crosshair, windowWidth, windowHeight);
-
+            // Update each node
             foreach (Node node in navagationGraph.NodeList)
             {
-                node.Update(gameTime, player);
+                node.Update(gameTime, player, crosshair, wallList);
             }
 
             // check for debug/grid/etc
@@ -267,36 +277,10 @@ namespace SampleGame
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.DarkBlue);       // clears background to selected color
-            Color alphaBlack = Color.Black;
-            alphaBlack.A = 200;
+            Color alphaBlack = Color.Black;             // the color black
+            alphaBlack.A = 200;                         // modified alpha channel
 
             spriteBatch.Begin();                        // begin drawing sprites
-
-            // draw the grid
-            //if (displayGrid)
-            //{
-            //    int gridSpacing = 50;                       // used for size of grid (X by X)
-
-            //     draw the vertical lines
-            //    for (int i = 0; i < windowWidth / CELL_SIZE; i++)
-            //    {
-            //        DrawingHelper.DrawFastLine(new Vector2(i * CELL_SIZE, i), new Vector2(i * CELL_SIZE, i * CELL_SIZE + windowHeight), Color.Gray);
-            //    }
-
-            //    // draw the horizontal lines
-            //    for (int i = 0; i < windowHeight / CELL_SIZE; i++)
-            //    {
-            //        DrawingHelper.DrawFastLine(new Vector2(i, i * CELL_SIZE), new Vector2(i * CELL_SIZE + windowWidth, i * CELL_SIZE), Color.Gray);
-            //    }
-
-            //    // draw each waypoint
-            //    foreach (BaseGameEntity waypoint in waypoints)
-            //    {
-            //        // TODO - waypoint.Draw(this.spriteBatch, font1);
-            //    }
-            //}
-
-
 
             // Draw walls, waypoints, and agents
             foreach (Wall wall in wallList)
@@ -330,7 +314,7 @@ namespace SampleGame
            
             // *********************** END DRAWING TEXT ON THE SCREEN FOR ASSIGNMENT ***************** //
 
-            player.Draw(this.spriteBatch, font1);   // draws the player object on the screen
+            player.Draw(this.spriteBatch, font1);       // draws the player object on the screen
 
             spriteBatch.End();                          // stop drawing sprites
 

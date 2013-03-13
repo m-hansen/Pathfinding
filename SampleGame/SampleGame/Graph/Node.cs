@@ -12,55 +12,62 @@ namespace SampleGame
 {
     public class Node : BaseGameEntity
     {
-        public int id = -1;                 // the id for each node
-        static int nextID = 0;              // keeps track of the next avaliable id
-        //public static Texture2D NodeTexture;             // todo?
-        List<Node> adjacentNodes = new List<Node>();
-        public Rectangle Cell;                     // the bounding rectangle
-        Vector2 waypoint;                   // the origin/waypoint in the cell/node
-        public bool Active = true;          // flag to determine whether the node is reachable or not (ie: is it a waypoint or a wall?)
+        public int id = -1;                             // the id for each node
+        static int nextID = 0;                          // keeps track of the next avaliable id
+        List<Node> adjacentNodes = new List<Node>();    // list of adjacent nodes
+        public Rectangle Cell;                          // the bounding rectangle
+        public bool Active = true;                      // flag to determine whether the node is reachable or not (ie: is it a waypoint or a wall?)
+
+        Rectangle adjacentNodeBounds;
+        const int cellSize = 50;
 
         public Node(Vector2 pos)
         {
             id = getNextID();
             Position = pos;
-            Cell = new Rectangle((int)Position.X-25, (int)Position.Y-25, 50, 50);
-            waypoint = Position;
+            Cell = new Rectangle((int)(Position.X - cellSize / 2), (int)(Position.Y - cellSize / 2), cellSize, cellSize);
+            adjacentNodeBounds = new Rectangle((int)(Position.X - cellSize * 1.25), (int)(Position.Y - cellSize * 1.25), (int)(cellSize * 2.5), (int)(cellSize * 2.5));
         }
 
+        // return the next avaliable ID for a node
         private int getNextID()
         {
             return nextID++;
         }
 
-        //public virtual void LoadContent(ContentManager contentManager, string assetName)
-        //{
-        //    // loading the image for the object
-        //    NodeTexture = contentManager.Load<Texture2D>("Images\\waypoint");
-
-        //    // setting the origin to the center of the object
-        //    Origin = new Vector2(Texture.Width / 2, Texture.Height / 2);
-        //}
-
-        public virtual void Update(GameTime gametime, Player player)
+        public virtual void Update(GameTime gametime, Player player, BaseGameEntity crosshair, List<Wall> wallList)
         {
-            Color = Cell.Contains(new Point((int)player.Position.X, (int)player.Position.Y)) ? Color.Green : Color.LightGray;
-
-            // if active add waypoint else add wall - set states?
-            //Texture = Active ? LoadContent(contentManager, "Images\\waypoint") : LoadContent(contentManager, "Images\\wall");
-        }
-
-        public bool doesCellContainPlayer(Player player)
-        {
+            // Change the color of a node based on what entity is near
             if (Cell.Contains(new Point((int)player.Position.X, (int)player.Position.Y)))
-                return true;
-            return false;
+                Color = Color.Green;
+            else if (Cell.Contains(new Point((int)crosshair.Position.X, (int)crosshair.Position.Y)))
+                Color = Color.DarkOrange;
+            else
+                Color = Color.LightGray;
+
+            // check if the cell contains a wall
+            foreach (Wall wall in wallList)
+            {
+                // if it does contain a wall, set to inactive
+                if (Cell.Contains(new Point((int)wall.Position.X, (int)wall.Position.Y)))
+                    Active = false;
+            }
+
+            // Check for adjacent nodes
+            if (Active)
+            {
+                
+            }
         }
 
         public virtual void Draw(SpriteBatch sprites, SpriteFont font1)
         {
             DrawingHelper.DrawRectangle(Cell, Color.Gray, false);
-            sprites.Draw(Texture, waypoint - Origin, Color);
+            if (id == 71)
+                DrawingHelper.DrawRectangle(adjacentNodeBounds, Color.Red, false);
+            if (Active)
+                sprites.Draw(Texture, Position - Origin, Color);
+
             sprites.DrawString(font1, id.ToString(), Position - new Vector2(15, 15), Color.White, Rotation, Origin, 0.5f, SpriteEffects.None, 1.0f);
         }
     }

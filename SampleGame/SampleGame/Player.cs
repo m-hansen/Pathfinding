@@ -14,6 +14,7 @@ namespace SampleGame
         public float Speed;  // forward - backward speed
         private List<Sensor> sensorList = new List<Sensor>();
         private SteeringBehaviors steering = new SteeringBehaviors();
+        private Vector2 previousPosition;
 
         public Player()
         {
@@ -114,26 +115,32 @@ namespace SampleGame
         }
 
         public void Update(GameTime gameTime, KeyboardState keyboardStateCurrent, KeyboardState keyboardStatePrevious, 
-            MouseState mouseStateCurrent, MouseState mouseStatePrevious, List<GameAgent> agentAIList, BaseGameEntity crosshair,
+            MouseState mouseStateCurrent, MouseState mouseStatePrevious, List<Wall> wallList, List<GameAgent> agentAIList, BaseGameEntity crosshair,
             int windowWidth, int windowHeight)
         {
             float elapsedTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
             
-            // update the heading each tick
-            //Heading = crosshair.Position;//Vector2.Multiply(crosshair.Position, MaxTurnRate);
-
-            
-
             // rotation
             if (keyboardStateCurrent.IsKeyDown(Keys.Left) || keyboardStateCurrent.IsKeyDown(Keys.A)){
                 Rotation -= (elapsedTime * RotationSpeed) % MathHelper.TwoPi;}
             if (keyboardStateCurrent.IsKeyDown(Keys.Right) || keyboardStateCurrent.IsKeyDown(Keys.D))
                 Rotation += (elapsedTime * RotationSpeed) % MathHelper.TwoPi;
 
+            // check for wall collision
+            Color = Color.White;
+            foreach (Wall wall in wallList)
+            {
+                if (Bounds.Intersects(wall.Bounds))
+                {
+                    Position = previousPosition;
+                }
+            }
+
             // TODO - move to crosshair
             Vector2 steeringForce = steering.seek(this, crosshair.Position);    // calculate the player's steering force
-            Vector2 acceleration = Vector2.Divide(steeringForce, Mass);  // calculate the acceleration (A = F/M)
+            Vector2 acceleration = Vector2.Divide(steeringForce, Mass);         // calculate the acceleration (A = F/M)
             Velocity += (acceleration * elapsedTime);                           // update the velocity (V = DT)
+            previousPosition = Position;
             Position += Velocity * elapsedTime;
 
             // update heading
@@ -154,19 +161,20 @@ namespace SampleGame
                 Rotation -= (size * elapsedTime * RotationSpeed) % MathHelper.TwoPi;    // sign -
             else if (size <= MathHelper.PiOver2)
                 Rotation -= (size * elapsedTime * RotationSpeed) % MathHelper.TwoPi;    // sign -
+
             // movement
             if (keyboardStateCurrent.IsKeyDown(Keys.Up) || keyboardStateCurrent.IsKeyDown(Keys.W))
             {
                 Vector2 nextPos = CalculateRotatedMovement(new Vector2(0, -1), Rotation) * Speed + Position;
 
-                if (IsValidMove(nextPos, agentAIList, windowWidth, windowHeight))
+                if (IsValidMove(nextPos, wallList, agentAIList, windowWidth, windowHeight))
                     Position = nextPos;
             }
             if (keyboardStateCurrent.IsKeyDown(Keys.Down) || keyboardStateCurrent.IsKeyDown(Keys.S))
             {
                 Vector2 nextPos = CalculateRotatedMovement(new Vector2(0, 1), Rotation) * Speed + Position;
 
-                if (IsValidMove(nextPos, agentAIList, windowWidth, windowHeight))
+                if (IsValidMove(nextPos, wallList, agentAIList, windowWidth, windowHeight))
                     Position = nextPos;
             }
 
@@ -179,7 +187,7 @@ namespace SampleGame
             base.Update(gameTime);
         }
 
-        private bool IsValidMove(Vector2 nextPos, List<GameAgent> agentAIList, int windowWidth, int windowHeight)
+        private bool IsValidMove(Vector2 nextPos, List<Wall> wallList, List<GameAgent> agentAIList, int windowWidth, int windowHeight)
         {
             Rectangle rect = new Rectangle
             (
@@ -190,6 +198,12 @@ namespace SampleGame
             );
 
             bool collision = false;
+
+            foreach (Wall wall in wallList)
+            {
+                if (collision = wall.Bounds.Intersects(rect))
+                    break;
+            }
 
             foreach (GameAgent agent in agentAIList)
             {
@@ -207,8 +221,8 @@ namespace SampleGame
                 sensor.Draw(sprites, this.Position, font1);
             }
 
-            DrawingHelper.DrawRectangle(Bounds, Color.Red, false);
-            //DrawingHelper.DrawFastLine(Position, Heading, Color.Yellow); // debug heading
+            DrawingHelper.DrawRectangle(Bounds, Color.Red, false); // debug - bounding rectangle
+            //DrawingHelper.DrawFastLine(Position, Heading, Color.Yellow); // debug - heading
 
             base.Draw(sprites, font1);
         }
