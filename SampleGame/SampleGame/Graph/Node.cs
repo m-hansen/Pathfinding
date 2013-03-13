@@ -16,16 +16,21 @@ namespace SampleGame
         static int nextID = 0;              // keeps track of the next avaliable id
         //public static Texture2D NodeTexture;             // todo?
         List<Node> adjacentNodes = new List<Node>();
-        Rectangle cell;                     // the bounding rectangle
+        public Rectangle Cell;                     // the bounding rectangle
         Vector2 waypoint;                   // the origin/waypoint in the cell/node
         public bool Active = true;          // flag to determine whether the node is reachable or not (ie: is it a waypoint or a wall?)
 
         public Node(Vector2 pos)
         {
-            id = nextID;
+            id = getNextID();
             Position = pos;
-            cell = new Rectangle((int)Position.X-25, (int)Position.Y-25, 50, 50);
+            Cell = new Rectangle((int)Position.X-25, (int)Position.Y-25, 50, 50);
             waypoint = Position;
+        }
+
+        private int getNextID()
+        {
+            return nextID++;
         }
 
         //public virtual void LoadContent(ContentManager contentManager, string assetName)
@@ -39,7 +44,7 @@ namespace SampleGame
 
         public virtual void Update(GameTime gametime, Player player)
         {
-            Color = cell.Contains(new Point((int)player.Position.X, (int)player.Position.Y)) ? Color.Green : Color.LightGray;
+            Color = Cell.Contains(new Point((int)player.Position.X, (int)player.Position.Y)) ? Color.Green : Color.LightGray;
 
             // if active add waypoint else add wall - set states?
             //Texture = Active ? LoadContent(contentManager, "Images\\waypoint") : LoadContent(contentManager, "Images\\wall");
@@ -47,15 +52,16 @@ namespace SampleGame
 
         public bool doesCellContainPlayer(Player player)
         {
-            if (cell.Contains(new Point((int)player.Position.X, (int)player.Position.Y)))
+            if (Cell.Contains(new Point((int)player.Position.X, (int)player.Position.Y)))
                 return true;
             return false;
         }
 
         public virtual void Draw(SpriteBatch sprites, SpriteFont font1)
         {
-            DrawingHelper.DrawRectangle(cell, Color.Gray, false);
+            DrawingHelper.DrawRectangle(Cell, Color.Gray, false);
             sprites.Draw(Texture, waypoint - Origin, Color);
+            sprites.DrawString(font1, id.ToString(), Position - new Vector2(15, 15), Color.White, Rotation, Origin, 0.5f, SpriteEffects.None, 1.0f);
         }
     }
 }

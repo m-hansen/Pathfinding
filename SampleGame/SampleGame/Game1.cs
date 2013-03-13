@@ -235,16 +235,24 @@ namespace SampleGame
                 //agentAIList.Add(agent);
                 //agent.Type = (int)Enums.AgentType.NPC;
 
-                // Create a new node
-                Node node = new Node(new Vector2(mouseStateCurrent.X, mouseStateCurrent.Y));
-                node.LoadContent(this.Content, "Images\\waypoint");
-                navagationGraph.NodeList.Add(node);
+                //// Create a new node
+                //Node node = new Node(new Vector2(mouseStateCurrent.X, mouseStateCurrent.Y));
+                //node.LoadContent(this.Content, "Images\\waypoint");
+                //navagationGraph.NodeList.Add(node);
 
                 // Create a wall
-                //Wall wall = new Wall();
-                //wall.LoadContent(this.Content, "Images\\wall");
-                //wall.Position = new Vector2(mouseStateCurrent.X, mouseStateCurrent.Y);
-                //wallList.Add(wall);
+                Point clickPos = new Point((int)mouseStateCurrent.X, (int)mouseStateCurrent.Y);
+                foreach (Node node in navagationGraph.NodeList)
+                {
+                    // find the node that the mouse clicked
+                    if (node.Cell.Contains(clickPos))
+                    {
+                        Wall wall = new Wall();
+                        wall.LoadContent(this.Content, "Images\\wall");
+                        wall.Position = node.Position;
+                        wallList.Add(wall);
+                    }
+                }
             }
 
             // Place crosshair at mouse position
@@ -263,15 +271,6 @@ namespace SampleGame
             alphaBlack.A = 200;
 
             spriteBatch.Begin();                        // begin drawing sprites
-
-            // Draw the navagation graph and grid
-            if (displayGrid)
-            {
-                foreach (Node node in navagationGraph.NodeList)
-                {
-                    node.Draw(this.spriteBatch, font1);
-                }
-            }
 
             // draw the grid
             //if (displayGrid)
@@ -304,10 +303,13 @@ namespace SampleGame
             {
                 wall.Draw(this.spriteBatch, font1);
             }
-            
-            foreach (Node node in navagationGraph.NodeList)
+
+            if (displayGrid)
             {
-                node.Draw(this.spriteBatch, font1);
+                foreach (Node node in navagationGraph.NodeList)
+                {
+                    node.Draw(this.spriteBatch, font1);
+                }
             }
 
             foreach (GameAgent agent in agentAIList)
@@ -341,11 +343,10 @@ namespace SampleGame
 
             if (displayDebugInfo)
             {
-                DrawingHelper.DrawRectangle(new Rectangle(15, 15, 275, 70), alphaBlack, true);
+                DrawingHelper.DrawRectangle(new Rectangle(15, 15, 275, 50), alphaBlack, true);
 
                 spriteBatch.DrawString(font1, "Player Pos: " + player.Position.X + ", " + player.Position.Y, new Vector2(20, 20), Color.White, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 1);
                 spriteBatch.DrawString(font1, "Player Heading: " + player.Heading.X + ", " + player.Heading.Y, new Vector2(20, 40), Color.White, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 1);
-                spriteBatch.DrawString(font1, "Current Cell: UNKNOWN " + CELL_SIZE, new Vector2(20, 60), Color.White, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 1);
             }
 
             spriteBatch.End();
