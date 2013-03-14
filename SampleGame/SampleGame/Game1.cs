@@ -222,13 +222,8 @@ namespace SampleGame
             // Update the player
             player.Update(gameTime, keyboardStateCurrent, keyboardStatePrevious, mouseStateCurrent, mouseStatePrevious, wallList, agentAIList, crosshair, windowWidth, windowHeight);
 
-            // Update each node
-            foreach (Node node in navagationGraph.NodeList)
-            {
-                node.Update(gameTime, player, crosshair, wallList);
-            }
-
-            navagationGraph.Update(gameTime, player, crosshair);
+            // Update the navagation graph and all of its nodes
+            navagationGraph.Update(gameTime, player, crosshair, wallList);
 
             // check for debug/grid/etc
             if ((keyboardStateCurrent.IsKeyUp(Keys.F3) && keyboardStatePrevious.IsKeyDown(Keys.F3)))
@@ -332,10 +327,25 @@ namespace SampleGame
 
             if (displayDebugInfo)
             {
-                DrawingHelper.DrawRectangle(new Rectangle(15, 15, 275, 50), alphaBlack, true);
+                string currentNodeText;
+                string targetNodeText;
+
+                DrawingHelper.DrawRectangle(new Rectangle(15, 15, 375, 110), alphaBlack, true);
 
                 spriteBatch.DrawString(font1, "Player Pos: " + player.Position.X + ", " + player.Position.Y, new Vector2(20, 20), Color.White, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 1);
                 spriteBatch.DrawString(font1, "Player Heading: " + player.Heading.X + ", " + player.Heading.Y, new Vector2(20, 40), Color.White, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 1);
+
+                // display info about the current node and its neighbors
+                currentNodeText = "Current Node ID: " + navagationGraph.CurrentNode.id + "       Neighbors: ";
+                foreach (Node adjNode in navagationGraph.CurrentNode.AdjacentNodes)
+                    currentNodeText += adjNode.id + ", ";
+                spriteBatch.DrawString(font1, currentNodeText, new Vector2(20, 80), Color.White, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 1);
+
+                // display info about the target node and its neighbors
+                targetNodeText = "Target Node ID: " + navagationGraph.TargetNode.id + "       Neighbors: ";
+                foreach (Node adjNode in navagationGraph.CurrentNode.AdjacentNodes)
+                    targetNodeText += adjNode.id + ", ";
+                spriteBatch.DrawString(font1, targetNodeText, new Vector2(20, 100), Color.White, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 1);
             }
 
             spriteBatch.End();

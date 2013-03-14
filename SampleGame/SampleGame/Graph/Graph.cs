@@ -12,29 +12,30 @@ namespace SampleGame
     {
         public List<Node> NodeList = new List<Node>();
 
-        Node currentNode;
-        Node targetNode;
+        int numHorizNodes = 16;
+        int numVertNodes = 12;
+        bool nodeNeedsUpdate = false;
+
+        public Node CurrentNode;
+        public Node TargetNode;
 
         public Graph()
         {
-
         }
 
-        public virtual void Update(GameTime gametime, Player player, BaseGameEntity crosshair)
+        public virtual void Update(GameTime gameTime, Player player, BaseGameEntity crosshair, List<Wall> wallList)
         {
+            updateNodeList(gameTime, player, crosshair, wallList);
+            updateTargetNode(crosshair);
+            updateCurrentNode(player);
 
-            foreach (Node node in NodeList)
+            // get the heuristic value for each node
+            if (nodeNeedsUpdate)
             {
-                // check for current node
-                if (node.Cell.Contains(new Point((int)player.Position.X, (int)player.Position.Y)))
+                // calculate the H value
+                foreach (Node node in NodeList)
                 {
-                    currentNode = node;
-                }
-
-                // check for target node
-                if (node.Cell.Contains(new Point((int)crosshair.Position.X, (int)crosshair.Position.Y)))
-                {
-                    targetNode = node;
+                    node.heuristic = calculateHeuristic(node, TargetNode);
                 }
             }
 
@@ -42,6 +43,58 @@ namespace SampleGame
             addAdjacentNodes();
         }
 
+        // update each node
+        private void updateNodeList(GameTime gameTime, Player player, BaseGameEntity crosshair, List<Wall> wallList)
+        {
+            foreach (Node node in NodeList)
+            {
+                node.Update(gameTime, player, crosshair, wallList);
+            }
+        }
+
+        // update the target node
+        private void updateTargetNode(BaseGameEntity crosshair)
+        {
+            nodeNeedsUpdate = false;
+
+            foreach (Node node in NodeList)
+            {
+                // check for target node
+                if (node != TargetNode && node.Cell.Contains(new Point((int)crosshair.Position.X, (int)crosshair.Position.Y)))
+                {
+                    TargetNode = node;
+                    nodeNeedsUpdate = true;
+                }
+            }
+        }
+
+        // update the current node
+        private void updateCurrentNode(Player player)
+        {
+            foreach (Node node in NodeList)
+            {
+                // check for current node
+                if (node.Cell.Contains(new Point((int)player.Position.X, (int)player.Position.Y)))
+                {
+                    CurrentNode = node;
+                }
+            }
+        }
+
+        // calculate the h (heuristic) value for A*
+        private int calculateHeuristic(Node currentNode, Node targetNode)
+        {
+            if (currentNode.Position.X >= targetNode.Position.X && currentNode.Position.Y >= targetNode.Position.Y)
+                return (int)(Math.Abs((currentNode.Position.X / Node.CELL_SIZE - targetNode.Position.X / Node.CELL_SIZE) + (currentNode.Position.Y / Node.CELL_SIZE - targetNode.Position.Y / Node.CELL_SIZE)));
+            else if (currentNode.Position.X < targetNode.Position.X && currentNode.Position.Y >= targetNode.Position.Y)
+                return (int)(Math.Abs((targetNode.Position.X / Node.CELL_SIZE - currentNode.Position.X / Node.CELL_SIZE) + (currentNode.Position.Y / Node.CELL_SIZE - targetNode.Position.Y / Node.CELL_SIZE)));
+            else if (currentNode.Position.X >= targetNode.Position.X && currentNode.Position.Y < targetNode.Position.Y)
+                return (int)(Math.Abs((currentNode.Position.X / Node.CELL_SIZE - targetNode.Position.X / Node.CELL_SIZE) + (targetNode.Position.Y / Node.CELL_SIZE - currentNode.Position.Y / Node.CELL_SIZE)));
+            else
+                return (int)(Math.Abs((targetNode.Position.X / Node.CELL_SIZE - currentNode.Position.X / Node.CELL_SIZE) + (targetNode.Position.Y / Node.CELL_SIZE - currentNode.Position.Y / Node.CELL_SIZE)));
+        }
+
+        // add a node to the list
         public void addNode(Vector2 nodePosition)
         {
             NodeList.Add(new Node(nodePosition));
@@ -82,22 +135,6 @@ namespace SampleGame
 
         public virtual void Draw(SpriteBatch sprites, SpriteFont font1)
         {
-            foreach (Node node in NodeList)
-            {
-                if (node.id == 86)
-                {
-                    int i = 200;
-                    //sprites.DrawString(font1, "Adjacent Nodes: " + node.id, new Vector2(i, 200), Color.White);
-                    foreach (Node anode in node.AdjacentNodes)
-                    {
-                        i += 20;
-                        sprites.DrawString(font1, "Adjacent Nodes: " + anode.id, new Vector2(200, i), Color.White);
-                    }
-                }
-            }
-
-            sprites.DrawString(font1, "Current Node ID: " + currentNode.id, new Vector2(20, 230), Color.White);
-            sprites.DrawString(font1, "Target Node ID: " + targetNode.id, new Vector2(20, 260), Color.White);
         }
     }
 }
