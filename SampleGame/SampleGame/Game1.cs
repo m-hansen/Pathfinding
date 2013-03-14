@@ -343,7 +343,7 @@ namespace SampleGame
 
                 // display info about the target node and its neighbors
                 targetNodeText = "Target Node ID: " + navagationGraph.TargetNode.id + "       Neighbors: ";
-                foreach (Node adjNode in navagationGraph.CurrentNode.AdjacentNodes)
+                foreach (Node adjNode in navagationGraph.TargetNode.AdjacentNodes)
                     targetNodeText += adjNode.id + ", ";
                 spriteBatch.DrawString(font1, targetNodeText, new Vector2(20, 100), Color.White, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 1);
             }
