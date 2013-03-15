@@ -330,7 +330,7 @@ namespace SampleGame
                 string currentNodeText;
                 string targetNodeText;
 
-                DrawingHelper.DrawRectangle(new Rectangle(15, 15, 375, 110), alphaBlack, true);
+                DrawingHelper.DrawRectangle(new Rectangle(15, 15, 500, 110), alphaBlack, true);
 
                 spriteBatch.DrawString(font1, "Player Pos: " + player.Position.X + ", " + player.Position.Y, new Vector2(20, 20), Color.White, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 1);
                 spriteBatch.DrawString(font1, "Player Heading: " + player.Heading.X + ", " + player.Heading.Y, new Vector2(20, 40), Color.White, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 1);

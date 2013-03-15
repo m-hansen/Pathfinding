@@ -100,8 +100,7 @@ namespace SampleGame
             NodeList.Add(new Node(nodePosition));
         }
 
-        // An adjacent node will take into account the top, bottom, left and right nodes
-        // it will NOT consider diagonals
+        // An adjacent node will take into account all of the nodes around it that aren't walls
         private void addAdjacentNodes()
         {
             // check for adjacent nodes
@@ -110,8 +109,10 @@ namespace SampleGame
                 foreach (Node node2 in NodeList)
                 {
                     // check left, right, top, and bottom nodes
-                    if ((!node.Equals(node2)) && (node2.id == (node.id + 1) || node2.id == (node.id - 1) ||
-                        node2.id == (node.id + 16) || node2.id == (node.id - 16)))
+                    if ((!node.Equals(node2)) && (node2.id == (node.id + 1) || node2.id == (node.id - 1) || // left/right
+                        node2.id == (node.id + 16) || node2.id == (node.id - 16) ||                         // top/bottom
+                        node2.id == (node.id - 17) || node2.id == (node.id - 15) ||                         // bottom right/left
+                        node2.id == (node.id + 17) || node2.id == (node.id + 15)))                          // top right/left
                     {
                         bool found = false;     // does the adjacent node already exist?
 
