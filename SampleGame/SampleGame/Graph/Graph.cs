@@ -5,10 +5,11 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Drawing;
 
 namespace SampleGame
 {
-    class Graph
+    public class Graph
     {
         public List<Node> NodeList = new List<Node>();
 
@@ -37,6 +38,12 @@ namespace SampleGame
                 {
                     node.heuristic = calculateHeuristic(node, TargetNode);
                 }
+            }
+
+            // calculate the movement cost of each node
+            foreach (Node potentialNode in CurrentNode.AdjacentNodes)
+            {
+                potentialNode.movementCost = calculateMovementCost(CurrentNode, potentialNode);
             }
 
             // update the adjacent nodes
@@ -84,6 +91,7 @@ namespace SampleGame
         // calculate the h (heuristic) value for A*
         private int calculateHeuristic(Node currentNode, Node targetNode)
         {
+            // calculate based on the X/Y coordinates of the current node and the target node
             if (currentNode.Position.X >= targetNode.Position.X && currentNode.Position.Y >= targetNode.Position.Y)
                 return (int)(Math.Abs((currentNode.Position.X / Node.CELL_SIZE - targetNode.Position.X / Node.CELL_SIZE) + (currentNode.Position.Y / Node.CELL_SIZE - targetNode.Position.Y / Node.CELL_SIZE)));
             else if (currentNode.Position.X < targetNode.Position.X && currentNode.Position.Y >= targetNode.Position.Y)
@@ -94,13 +102,30 @@ namespace SampleGame
                 return (int)(Math.Abs((targetNode.Position.X / Node.CELL_SIZE - currentNode.Position.X / Node.CELL_SIZE) + (targetNode.Position.Y / Node.CELL_SIZE - currentNode.Position.Y / Node.CELL_SIZE)));
         }
 
+        // calculate the g (movement) cost for A*
+        private int calculateMovementCost(Node currentNode, Node targetNode)
+        {
+            // the node is directly horizontal or vertical and should have a movement cost of 10
+            if (currentNode.id == (targetNode.id + 1) || currentNode.id == (targetNode.id - 1) ||  // left/right
+                currentNode.id == (targetNode.id + 16) || currentNode.id == (targetNode.id - 16))   // top/bottom
+                return 10;
+            
+            // the node is at a diagonal and should have a movement cost of 14
+            if (currentNode.id == (targetNode.id - 17) || currentNode.id == (targetNode.id - 15) || // bottom right/left
+                currentNode.id == (targetNode.id + 17) || currentNode.id == (targetNode.id + 15))   // top right/left
+                return 14;
+
+            // no movement cost because the nodes are the same (or an error occured)
+            return 0;
+        }
+
         // add a node to the list
         public void addNode(Vector2 nodePosition)
         {
             NodeList.Add(new Node(nodePosition));
         }
 
-        // An adjacent node will take into account all of the nodes around it that aren't walls
+        // An adjacent node will take into account all of the nodes around it
         private void addAdjacentNodes()
         {
             // check for adjacent nodes
@@ -136,6 +161,7 @@ namespace SampleGame
 
         public virtual void Draw(SpriteBatch sprites, SpriteFont font1)
         {
+            DrawingHelper.DrawFastLine(CurrentNode.Position, TargetNode.Position, Color.White);
         }
     }
 }

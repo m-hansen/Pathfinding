@@ -7,8 +7,8 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>C:\Users\Matthew\Desktop\pathfinding\SampleGame\SampleGame\bin\x86\Debug\Content\Images\ship1.xnb</Output>
-      <Time>2013-03-15T12:12:25.7543433-04:00</Time>
+      <Output>C:\Users\Matt\Desktop\pathfinding\SampleGame\SampleGame\bin\x86\Debug\Content\Images\ship1.xnb</Output>
+      <Time>2013-03-15T13:54:45.0469454-04:00</Time>
     </Item>
     <Item>
       <Source>Images\agent.png</Source>
@@ -19,8 +19,8 @@
         <Data Key="ColorKeyColor">255, 255, 255, 255</Data>
       </Parameters>
       <Options>None</Options>
-      <Output>C:\Users\Matthew\Desktop\pathfinding\SampleGame\SampleGame\bin\x86\Debug\Content\Images\agent.xnb</Output>
-      <Time>2013-03-15T12:12:25.7543433-04:00</Time>
+      <Output>C:\Users\Matt\Desktop\pathfinding\SampleGame\SampleGame\bin\x86\Debug\Content\Images\agent.xnb</Output>
+      <Time>2013-03-15T13:54:45.0449453-04:00</Time>
     </Item>
     <Item>
       <Source>Images\subject.png</Source>
@@ -31,8 +31,8 @@
         <Data Key="ColorKeyColor">255, 255, 255, 255</Data>
       </Parameters>
       <Options>None</Options>
-      <Output>C:\Users\Matthew\Desktop\pathfinding\SampleGame\SampleGame\bin\x86\Debug\Content\Images\subject.xnb</Output>
-      <Time>2013-03-15T12:12:25.7699438-04:00</Time>
+      <Output>C:\Users\Matt\Desktop\pathfinding\SampleGame\SampleGame\bin\x86\Debug\Content\Images\subject.xnb</Output>
+      <Time>2013-03-15T13:54:45.0479454-04:00</Time>
     </Item>
     <Item>
       <Source>Images\wall.png</Source>
@@ -40,8 +40,8 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>C:\Users\Matthew\Desktop\pathfinding\SampleGame\SampleGame\bin\x86\Debug\Content\Images\wall.xnb</Output>
-      <Time>2013-03-15T12:12:25.7699438-04:00</Time>
+      <Output>C:\Users\Matt\Desktop\pathfinding\SampleGame\SampleGame\bin\x86\Debug\Content\Images\wall.xnb</Output>
+      <Time>2013-03-15T13:54:45.0479454-04:00</Time>
     </Item>
     <Item>
       <Source>Images\crosshair.png</Source>
@@ -52,8 +52,8 @@
         <Data Key="ColorKeyColor">255, 255, 255, 255</Data>
       </Parameters>
       <Options>None</Options>
-      <Output>C:\Users\Matthew\Desktop\pathfinding\SampleGame\SampleGame\bin\x86\Debug\Content\Images\crosshair.xnb</Output>
-      <Time>2013-03-15T12:12:25.7543433-04:00</Time>
+      <Output>C:\Users\Matt\Desktop\pathfinding\SampleGame\SampleGame\bin\x86\Debug\Content\Images\crosshair.xnb</Output>
+      <Time>2013-03-15T13:54:45.0449453-04:00</Time>
     </Item>
     <Item>
       <Source>Images\player.png</Source>
@@ -64,8 +64,8 @@
         <Data Key="ColorKeyColor">255, 255, 255, 255</Data>
       </Parameters>
       <Options>None</Options>
-      <Output>C:\Users\Matthew\Desktop\pathfinding\SampleGame\SampleGame\bin\x86\Debug\Content\Images\player.xnb</Output>
-      <Time>2013-03-15T12:12:25.7543433-04:00</Time>
+      <Output>C:\Users\Matt\Desktop\pathfinding\SampleGame\SampleGame\bin\x86\Debug\Content\Images\player.xnb</Output>
+      <Time>2013-03-15T13:54:45.0459453-04:00</Time>
     </Item>
     <Item>
       <Source>Images\waypoint.png</Source>
@@ -76,8 +76,8 @@
         <Data Key="ColorKeyColor">255, 255, 255, 255</Data>
       </Parameters>
       <Options>None</Options>
-      <Output>C:\Users\Matthew\Desktop\pathfinding\SampleGame\SampleGame\bin\x86\Debug\Content\Images\waypoint.xnb</Output>
-      <Time>2013-03-15T12:12:25.7699438-04:00</Time>
+      <Output>C:\Users\Matt\Desktop\pathfinding\SampleGame\SampleGame\bin\x86\Debug\Content\Images\waypoint.xnb</Output>
+      <Time>2013-03-15T13:54:45.0479454-04:00</Time>
     </Item>
     <Item>
       <Source>Fonts\Font1.spritefont</Source>
@@ -85,8 +85,8 @@
       <Importer>FontDescriptionImporter</Importer>
       <Processor>FontDescriptionProcessor</Processor>
       <Options>None</Options>
-      <Output>C:\Users\Matthew\Desktop\pathfinding\SampleGame\SampleGame\bin\x86\Debug\Content\Fonts\Font1.xnb</Output>
-      <Time>2013-03-15T12:12:25.7543433-04:00</Time>
+      <Output>C:\Users\Matt\Desktop\pathfinding\SampleGame\SampleGame\bin\x86\Debug\Content\Fonts\Font1.xnb</Output>
+      <Time>2013-03-15T13:54:45.0369448-04:00</Time>
     </Item>
     <BuildSuccessful>true</BuildSuccessful>
     <Settings>
@@ -94,10 +94,10 @@
       <TargetProfile>HiDef</TargetProfile>
       <BuildConfiguration>Debug</BuildConfiguration>
       <CompressContent>false</CompressContent>
-      <RootDirectory>C:\Users\Matthew\Desktop\pathfinding\SampleGame\SampleGameContent\</RootDirectory>
-      <LoggerRootDirectory>C:\Users\Matthew\Desktop\pathfinding\SampleGame\SampleGame\</LoggerRootDirectory>
-      <IntermediateDirectory>C:\Users\Matthew\Desktop\pathfinding\SampleGame\SampleGameContent\obj\x86\Debug\</IntermediateDirectory>
-      <OutputDirectory>C:\Users\Matthew\Desktop\pathfinding\SampleGame\SampleGame\bin\x86\Debug\Content\</OutputDirectory>
+      <RootDirectory>C:\Users\Matt\Desktop\pathfinding\SampleGame\SampleGameContent\</RootDirectory>
+      <LoggerRootDirectory>C:\Users\Matt\Desktop\pathfinding\SampleGame\SampleGame\</LoggerRootDirectory>
+      <IntermediateDirectory>C:\Users\Matt\Desktop\pathfinding\SampleGame\SampleGameContent\obj\x86\Debug\</IntermediateDirectory>
+      <OutputDirectory>C:\Users\Matt\Desktop\pathfinding\SampleGame\SampleGame\bin\x86\Debug\Content\</OutputDirectory>
     </Settings>
     <Assemblies>
       <Assembly>
@@ -125,8 +125,8 @@
         <Value>2010-08-23T13:41:18-04:00</Value>
       </Assembly>
       <Assembly>
-        <Key>C:\WINDOWS\Microsoft.Net\assembly\GAC_32\Microsoft.Xna.Framework.Content.Pipeline\v4.0_4.0.0.0__842cf8be1de50553\Microsoft.Xna.Framework.Content.Pipeline.dll</Key>
-        <Value>2013-01-24T03:16:34.4213269-05:00</Value>
+        <Key>C:\Windows\Microsoft.Net\assembly\GAC_32\Microsoft.Xna.Framework.Content.Pipeline\v4.0_4.0.0.0__842cf8be1de50553\Microsoft.Xna.Framework.Content.Pipeline.dll</Key>
+        <Value>2013-01-15T21:28:16.2870881-05:00</Value>
       </Assembly>
     </Assemblies>
   </Asset>

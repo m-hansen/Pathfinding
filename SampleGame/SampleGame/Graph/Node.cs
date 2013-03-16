@@ -12,17 +12,16 @@ namespace SampleGame
 {
     public class Node : BaseGameEntity
     {
-        public int id = -1;                             // the id for each node
-        public List<Node> AdjacentNodes = new List<Node>();    // list of adjacent nodes
-        public Rectangle Cell;                          // the bounding rectangle
-        public bool Active = true;                      // flag to determine whether the node is reachable or not (ie: is it a waypoint or a wall?)
+        public int id = -1;                                     // the id for each node
+        public List<Node> AdjacentNodes = new List<Node>();     // list of adjacent nodes
+        public Rectangle Cell;                                  // the bounding rectangle
+        public bool Active = true;                              // flag to determine whether the node is reachable or not (ie: is it a waypoint or a wall?)
 
-        static int nextID = 0;                          // keeps track of the next avaliable id
-        Rectangle adjacentNodeBounds;
-        public const int CELL_SIZE = 50;
-        public int heuristic;                           // H - heuristic
-        public int movementCost;                        // G - movement cost
-        public int totalCost;                           // F = G + H
+        static int nextID = 0;                                  // keeps track of the next avaliable id
+        public const int CELL_SIZE = 50;                        // the size of each cell
+        public int heuristic;                                   // H - heuristic
+        public int movementCost;                                // G - movement cost
+        public int totalCost;                                   // F = G + H
 
 
         public Node(Vector2 pos)
@@ -30,7 +29,6 @@ namespace SampleGame
             id = getNextID();
             Position = pos;
             Cell = new Rectangle((int)(Position.X - CELL_SIZE / 2), (int)(Position.Y - CELL_SIZE / 2), CELL_SIZE, CELL_SIZE);
-            adjacentNodeBounds = new Rectangle((int)(Position.X - CELL_SIZE * 1.25), (int)(Position.Y - CELL_SIZE * 1.25), (int)(CELL_SIZE * 2.5), (int)(CELL_SIZE * 2.5));
         }
 
         // return the next avaliable ID for a node
@@ -56,18 +54,24 @@ namespace SampleGame
                 if (Cell.Contains(new Point((int)wall.Position.X, (int)wall.Position.Y)))
                     Active = false;
             }
+
+            // calculate the f (total cost) value
+            totalCost = movementCost + heuristic;   // F = G + H
         }
 
         public virtual void Draw(SpriteBatch sprites, SpriteFont font1)
         {
+            // draw the grid
             DrawingHelper.DrawRectangle(Cell, Color.Gray, false);
-            if (id == 71)
-                DrawingHelper.DrawRectangle(adjacentNodeBounds, Color.Red, false);
+
             if (Active)
                 sprites.Draw(Texture, Position - Origin, Color);
 
-            sprites.DrawString(font1, id.ToString(), Position - new Vector2(15, 15), Color.White, Rotation, Origin, 0.5f, SpriteEffects.None, 1.0f);
-            sprites.DrawString(font1, heuristic.ToString(), Position + new Vector2(15, -15), Color.Yellow, Rotation, Origin, 0.5f, SpriteEffects.None, 1.0f);
+            // display debug information in each cell
+            sprites.DrawString(font1, id.ToString(), Position + new Vector2(-15, -15), Color.White, Rotation, Origin, 0.5f, SpriteEffects.None, 1.0f);              // display the node id          (top left)
+            sprites.DrawString(font1, heuristic.ToString(), Position + new Vector2(15, -15), Color.Yellow, Rotation, Origin, 0.5f, SpriteEffects.None, 1.0f);       // display the heuristic        (top right)
+            sprites.DrawString(font1, movementCost.ToString(), Position + new Vector2(15, 15), Color.Yellow, Rotation, Origin, 0.5f, SpriteEffects.None, 1.0f);     // display the movement cost    (bottom right)
+            sprites.DrawString(font1, totalCost.ToString(), Position + new Vector2(-15, 15), Color.Yellow, Rotation, Origin, 0.5f, SpriteEffects.None, 1.0f);       // display the total cost       (bottom left)
         }
     }
 }

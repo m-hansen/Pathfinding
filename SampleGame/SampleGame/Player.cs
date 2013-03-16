@@ -22,6 +22,7 @@ namespace SampleGame
             MaxForce = 2.0f;
             MaxTurnRate = 5.0f;
             Mass = 2.0f;
+            Scale = 1.0f;
             Heading = new Vector2(0, -1);
         }
 
@@ -61,7 +62,7 @@ namespace SampleGame
             {
                 Type = (int)Enums.SensorType.AgentSensor,
                 Radius = 150,
-                Key = Keys.O,
+                Key = Keys.O
             });
 
             sensorList.Add(new PieSliceSensor() // - 60 to 60 degrees
@@ -107,6 +108,13 @@ namespace SampleGame
                 DisplayText = "(0,-1) - Left",
                 Index = 3
             });
+
+            sensorList.Add(new PathNodeSensor()
+            {
+                Type = (int)Enums.SensorType.NodeSensor,
+                Radius = 150,
+                Key = Keys.U
+            });
         }
 
         public Vector2 CalculateRotatedMovement(Vector2 point, float rotation)
@@ -137,11 +145,11 @@ namespace SampleGame
             }
 
             // TODO - move to crosshair
-            Vector2 steeringForce = steering.seek(this, crosshair.Position);    // calculate the player's steering force
-            Vector2 acceleration = Vector2.Divide(steeringForce, Mass);         // calculate the acceleration (A = F/M)
-            Velocity += (acceleration * elapsedTime);                           // update the velocity (V = DT)
-            previousPosition = Position;
-            Position += Velocity * elapsedTime;
+            //Vector2 steeringForce = steering.seek(this, crosshair.Position);    // calculate the player's steering force
+            //Vector2 acceleration = Vector2.Divide(steeringForce, Mass);         // calculate the acceleration (A = F/M)
+            //Velocity += (acceleration * elapsedTime);                           // update the velocity (V = DT)
+            //previousPosition = Position;
+            //Position += Velocity * elapsedTime;
 
             // update heading
             Vector2 v2 = Vector2.Multiply(Velocity, Velocity);  // Velocity squared
@@ -152,15 +160,15 @@ namespace SampleGame
                 // TODO update side
             }
 
-            float size = (float)Math.Atan2(crosshair.Position.X * Heading.Y - Heading.X * crosshair.Position.Y, Heading.X * crosshair.Position.X + Heading.Y * crosshair.Position.Y);
-            if (size <= MathHelper.PiOver2)
-                Rotation += (size * elapsedTime * RotationSpeed) % MathHelper.TwoPi;    // sign +
-            else if (size > MathHelper.PiOver2)
-                Rotation += (size * elapsedTime * RotationSpeed) % MathHelper.TwoPi;    // sign +
-            else if (size > MathHelper.PiOver2)
-                Rotation -= (size * elapsedTime * RotationSpeed) % MathHelper.TwoPi;    // sign -
-            else if (size <= MathHelper.PiOver2)
-                Rotation -= (size * elapsedTime * RotationSpeed) % MathHelper.TwoPi;    // sign -
+            //float size = (float)Math.Atan2(crosshair.Position.X * Heading.Y - Heading.X * crosshair.Position.Y, Heading.X * crosshair.Position.X + Heading.Y * crosshair.Position.Y);
+            //if (size <= MathHelper.PiOver2)
+            //    Rotation += (size * elapsedTime * RotationSpeed) % MathHelper.TwoPi;    // sign +
+            //else if (size > MathHelper.PiOver2)
+            //    Rotation += (size * elapsedTime * RotationSpeed) % MathHelper.TwoPi;    // sign +
+            //else if (size > MathHelper.PiOver2)
+            //    Rotation -= (size * elapsedTime * RotationSpeed) % MathHelper.TwoPi;    // sign -
+            //else if (size <= MathHelper.PiOver2)
+            //    Rotation -= (size * elapsedTime * RotationSpeed) % MathHelper.TwoPi;    // sign -
 
             // movement
             if (keyboardStateCurrent.IsKeyDown(Keys.Up) || keyboardStateCurrent.IsKeyDown(Keys.W))
@@ -223,7 +231,7 @@ namespace SampleGame
 
             DrawingHelper.DrawRectangle(Bounds, Color.Red, false); // debug - bounding rectangle
             //DrawingHelper.DrawFastLine(Position, Heading, Color.Yellow); // debug - heading
-
+            //sprites.Draw(Texture, Position, Bounds, Color, Rotation, Origin, Scale, SpriteEffects.None, 0.0f);
             base.Draw(sprites, font1);
         }
     }

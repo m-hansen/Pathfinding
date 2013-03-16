@@ -11,7 +11,8 @@ namespace SampleGame
         {
             RangeFinder = 0,
             AgentSensor = 1,
-            PieSliceSensor = 2
+            PieSliceSensor = 2,
+            NodeSensor = 3
         }
 
         public enum AgentType

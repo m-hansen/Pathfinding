@@ -17,7 +17,7 @@ namespace SampleGame
 
         public virtual void Update(KeyboardState keyboard, List<GameAgent> agentAIList, Vector2 playerPos, float playerRot)
         {
-            
+
         }
 
         public Vector2 CalculateRotatedMovement(Vector2 point, float rotation)

@@ -118,6 +118,7 @@
     <Compile Include="BaseGameEntity.cs" />
     <Compile Include="Enums.cs" />
     <Compile Include="GameAgent.cs" />
+    <Compile Include="Sensors\PathNodeSensor.cs" />
     <Compile Include="Sensors\PieSliceSensor.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
