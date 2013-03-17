@@ -19,11 +19,12 @@ namespace SampleGame
 
         static int nextID = 0;                                  // keeps track of the next avaliable id
         public const int CELL_SIZE = 50;                        // the size of each cell
-        public int heuristic;                                   // H - heuristic
-        public int movementCost;                                // G - movement cost
-        public int totalCost;                                   // F = G + H
+        public int Heuristic;                                   // H - Heuristic
+        public int MovementCost;                                // G - movement cost
+        public int TotalCost;                                   // F = G + H
         public Node ParentNode;                                 // nodes in the A* algorithm will have a parent node
 
+        public bool IsStart = false;
 
         public Node(Vector2 pos)
         {
@@ -41,12 +42,13 @@ namespace SampleGame
         public virtual void Update(GameTime gametime, Player player, BaseGameEntity crosshair, List<Wall> wallList)
         {
             // Change the color of a node based on what entity is near
-            if (Cell.Contains(new Point((int)player.Position.X, (int)player.Position.Y)))
-                Color = Color.Green;
-            else if (Cell.Contains(new Point((int)crosshair.Position.X, (int)crosshair.Position.Y)))
-                Color = Color.DarkOrange;
-            else
-                Color = Color.LightGray;
+            //if (Cell.Contains(new Point((int)player.Position.X, (int)player.Position.Y)))
+            //    Color = Color.Green;
+            //else if (Cell.Contains(new Point((int)crosshair.Position.X, (int)crosshair.Position.Y)))
+            //    Color = Color.DarkOrange;
+            //else
+            //    Color = Color.LightGray;
+
 
             // check if the cell contains a wall
             foreach (Wall wall in wallList)
@@ -57,7 +59,7 @@ namespace SampleGame
             }
 
             // calculate the f (total cost) value
-            totalCost = movementCost + heuristic;   // F = G + H
+            TotalCost = MovementCost + Heuristic;   // F = G + H
         }
 
         public virtual void Draw(SpriteBatch sprites, SpriteFont font1)
@@ -70,9 +72,9 @@ namespace SampleGame
 
             // display debug information in each cell
             sprites.DrawString(font1, id.ToString(), Position + new Vector2(-15, -15), Color.White, Rotation, Origin, 0.5f, SpriteEffects.None, 1.0f);              // display the node id          (top left)
-            sprites.DrawString(font1, heuristic.ToString(), Position + new Vector2(15, -15), Color.Yellow, Rotation, Origin, 0.5f, SpriteEffects.None, 1.0f);       // display the heuristic        (top right)
-            sprites.DrawString(font1, movementCost.ToString(), Position + new Vector2(15, 15), Color.Yellow, Rotation, Origin, 0.5f, SpriteEffects.None, 1.0f);     // display the movement cost    (bottom right)
-            sprites.DrawString(font1, totalCost.ToString(), Position + new Vector2(-15, 15), Color.Yellow, Rotation, Origin, 0.5f, SpriteEffects.None, 1.0f);       // display the total cost       (bottom left)
+            sprites.DrawString(font1, Heuristic.ToString(), Position + new Vector2(15, -15), Color.Yellow, Rotation, Origin, 0.5f, SpriteEffects.None, 1.0f);       // display the Heuristic        (top right)
+            sprites.DrawString(font1, MovementCost.ToString(), Position + new Vector2(15, 15), Color.Yellow, Rotation, Origin, 0.5f, SpriteEffects.None, 1.0f);     // display the movement cost    (bottom right)
+            sprites.DrawString(font1, TotalCost.ToString(), Position + new Vector2(-15, 15), Color.Yellow, Rotation, Origin, 0.5f, SpriteEffects.None, 1.0f);       // display the total cost       (bottom left)
         }
     }
 }

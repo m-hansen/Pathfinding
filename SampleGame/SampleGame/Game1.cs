@@ -65,19 +65,6 @@ namespace SampleGame
             crosshair = new BaseGameEntity();
             crosshair.Position = new Vector2(windowWidth / 2+1, windowHeight / 2+1); // TODO - slight offset to temporarly bypass a bug
 
-            // ************ CREATING THE WALLS FOR THE ASSIGNMENT ********* //
-
-            /*int defaultWalls = 3;
-
-            for (int i = 0; i < defaultWalls; i++)
-            {
-                agentAIList.Add(new GameAgent()
-                {
-                    Type = (int)Enums.AgentType.Wall
-                });
-            }*/
-
-            // ********** END CREATING THE WALLS FOR THE ASSIGNMENT ******* //
 
             // create the navagation graph
             navagationGraph = new Graph();
@@ -110,15 +97,17 @@ namespace SampleGame
             // loading the font to display text on the screen
             font1 = Content.Load<SpriteFont>("fonts/Font1");
 
+            // loading crosshair's image
             crosshair.LoadContent(this.Content, "Images\\crosshair");
 
+            // load the waypoint image
             foreach (Node node in navagationGraph.NodeList)
             {
                 node.LoadContent(this.Content, "Images\\waypoint");
             }
 
 
-            // *********************** MAP GENERATION *********************** //
+            // *********************** MAP GENERATION FOR ASSIGNMENT 2 *********************** //
 
             // add static walls
             List<int> wallNodes = new List<int>();
@@ -147,58 +136,7 @@ namespace SampleGame
                 }
             }
 
-            // *********************** END MAP GENERATION *********************** //
-
-
-            // ************ LOADING THE WALLS FOR THE ASSIGNMENT ********* //
-
-            //agentAIList[0].LoadContent(this.Content, "Images\\wall");
-            //agentAIList[1].LoadContent(this.Content, "Images\\wall");
-            //agentAIList[2].LoadContent(this.Content, "Images\\wall");
-
-            //agentAIList[0].Rotation = MathHelper.PiOver2;
-
-            //agentAIList[0].Scale = 1;
-            //agentAIList[1].Scale = 1;
-            //agentAIList[2].Scale = 1;
-
-            //agentAIList[0].Position = new Vector2(325, 350);
-            //agentAIList[1].Position = new Vector2(650, 325);
-            //agentAIList[2].Position = new Vector2(350, 525);
-
-            //Random rnd = new Random();
-
-            //for (int i = 0; i < agentAIList.Count; i++)
-            //{
-            //    int randNumb = rnd.Next(1);
-            //    agentAIList[i].LoadContent(this.Content, randNumb > 0 ? "Images\\wall" : "Images\\wall1", null, 1, randNumb > 0);
-            //    agentAIList[i].Scale = (float)rnd.Next(100) / 50 + 1;
-            //    agentAIList[i].Position = new Vector2(rnd.Next(windowWidth), rnd.Next(windowHeight));
-
-            //    int targetIndex = -1;
-
-            //    // making sure the walls aren't out of the zone, intersecting the player, or intersecting other walls
-            //    while (targetIndex < i)
-            //    {
-            //        Rectangle r = agentAIList[i].Bounds;
-            //        if (targetIndex < 0 && (r.Left < 0 || r.Top < 0 || r.Left + r.Width > windowWidth || r.Top + r.Height > windowHeight || r.Intersects(player.Bounds)))
-            //        {
-            //            agentAIList[i].Position = new Vector2(rnd.Next(windowWidth), rnd.Next(windowHeight));
-            //        }
-            //        else if (targetIndex >= 0 && agentAIList[i].Bounds.Intersects(agentAIList[targetIndex].Bounds))
-            //        {
-            //            agentAIList[i].Position = new Vector2(rnd.Next(windowWidth), rnd.Next(windowHeight));
-
-            //            targetIndex = 0;
-            //        }
-            //        else
-            //        {
-            //            targetIndex++;
-            //        }
-            //    }
-            //}
-
-            // ********* END LOADING THE WALLS FOR THE ASSIGNMENT ******** //
+            // *********************** END MAP GENERATION FOR ASSIGNMENT 2 *********************** //
         }
 
         protected override void UnloadContent()
@@ -223,7 +161,7 @@ namespace SampleGame
             player.Update(gameTime, keyboardStateCurrent, keyboardStatePrevious, mouseStateCurrent, mouseStatePrevious, wallList, navagationGraph, agentAIList, crosshair, windowWidth, windowHeight);
 
             // Update the navagation graph and all of its nodes
-            navagationGraph.Update(gameTime, player, crosshair, wallList);
+            navagationGraph.Update(gameTime, mouseStateCurrent, mouseStatePrevious, player, crosshair, wallList);
 
             // check for debug/grid/etc
             if ((keyboardStateCurrent.IsKeyUp(Keys.F3) && keyboardStatePrevious.IsKeyDown(Keys.F3)))
@@ -248,21 +186,21 @@ namespace SampleGame
                 //navagationGraph.NodeList.Add(node);
 
                 // Create a wall
-                Point clickPos = new Point((int)mouseStateCurrent.X, (int)mouseStateCurrent.Y);
-                foreach (Node node in navagationGraph.NodeList)
-                {
-                    // find the node that the mouse clicked
-                    if (node.Cell.Contains(clickPos))
-                    {
-                        Wall wall = new Wall();
-                        wall.LoadContent(this.Content, "Images\\wall");
-                        wall.Position = node.Position;
-                        wall.Bounds = new Rectangle(
-                            (int)(wall.Position.X - wall.Origin.X * wall.Scale), (int)(wall.Position.Y - wall.Origin.Y * wall.Scale),
-                            (int)(wall.Texture.Width), (int)(wall.Texture.Height));
-                        wallList.Add(wall);
-                    }
-                }
+                //Point clickPos = new Point((int)mouseStateCurrent.X, (int)mouseStateCurrent.Y);
+                //foreach (Node node in navagationGraph.NodeList)
+                //{
+                //    // find the node that the mouse clicked
+                //    if (node.Cell.Contains(clickPos))
+                //    {
+                //        Wall wall = new Wall();
+                //        wall.LoadContent(this.Content, "Images\\wall");
+                //        wall.Position = node.Position;
+                //        wall.Bounds = new Rectangle(
+                //            (int)(wall.Position.X - wall.Origin.X * wall.Scale), (int)(wall.Position.Y - wall.Origin.Y * wall.Scale),
+                //            (int)(wall.Texture.Width), (int)(wall.Texture.Height));
+                //        wallList.Add(wall);
+                //    }
+                //}
             }
 
             // Place crosshair at mouse position

@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using Drawing;
 
 namespace SampleGame
@@ -16,10 +17,16 @@ namespace SampleGame
         // used for A*
         public List<Node> OpenList = new List<Node>();          // contains a list of nodes that need to be checked
         public List<Node> ClosedList = new List<Node>();        // contains a list of nodes that have been checked already
+        List<Node> path = new List<Node>();
 
         int numHorizNodes = 16;                                 // number of horizontal nodes
         int numVertNodes = 12;                                  // number of vertical nodes
-        bool nodeNeedsUpdate = false;                           // used to determine if we need to update the node or not
+
+        /* TODO should be false */
+        bool nodeNeedsUpdate = true;                           // used to determine if we need to update the node or not
+
+
+
         bool isOnOpenList = false;                              // used to determine if the node in on the open list
         bool isOnClosedList = false;                            // used to determine if the node in on the open list
 
@@ -31,19 +38,55 @@ namespace SampleGame
         {
         }
 
-        public virtual void Update(GameTime gameTime, Player player, BaseGameEntity crosshair, List<Wall> wallList)
+        public virtual void Update(GameTime gameTime, MouseState mouseStateCurrent, MouseState mouseStatePrevious, Player player, BaseGameEntity crosshair, List<Wall> wallList)
         {
+            // pressing the left mouse button sets the start node
+            if (mouseStateCurrent.LeftButton == ButtonState.Pressed && mouseStatePrevious.LeftButton != ButtonState.Pressed)
+            {
+                foreach (Node node in NodeList)
+                {
+                    if (node.Cell.Contains(new Point((int)mouseStateCurrent.X, (int)mouseStateCurrent.Y)))
+                    {
+                        if (StartNode != null) 
+                            StartNode.Color = Color.LightGray;
+                        StartNode = node;
+                    }
+                }
+            }
+
+            // pressing the right mouse button sets the target node
+            if (mouseStateCurrent.RightButton == ButtonState.Pressed && mouseStatePrevious.RightButton != ButtonState.Pressed)
+            {
+                foreach (Node node in NodeList)
+                {
+                    if (node.Cell.Contains(new Point((int)mouseStateCurrent.X, (int)mouseStateCurrent.Y)))
+                    {
+                        if (TargetNode != null)
+                            TargetNode.Color = Color.LightGray;
+                        TargetNode = node;
+                    }
+                }
+            }
+
+            // check to make sure the nodes exists before setting the color
+            if (StartNode != null) 
+                StartNode.Color = Color.Green;       
+            if (TargetNode != null)
+                TargetNode.Color = Color.DarkOrange;
+
             updateNodeList(gameTime, player, crosshair, wallList);
             updateTargetNode(crosshair);
             updateCurrentNode(player);
+            //if (nodeNeedsUpdate)
+                //calculateAStar(StartNode, TargetNode);
 
-            // get the heuristic value for each node
+            // get the Heuristic value for each node
             if (nodeNeedsUpdate)
             {
                 // calculate the H value
                 foreach (Node node in NodeList)
                 {
-                    node.heuristic = calculateHeuristic(node, TargetNode);
+                    node.Heuristic = calculateHeuristic(node, TargetNode);
                 }
             }
 
@@ -96,12 +139,87 @@ namespace SampleGame
             // calculate the movement cost of each node
             foreach (Node potentialNode in CurrentNode.AdjacentNodes)
             {
-                potentialNode.movementCost = calculateMovementCost(CurrentNode, potentialNode);
+                potentialNode.MovementCost = calculateMovementCost(CurrentNode, potentialNode);
             }
 
             // update the adjacent nodes
             addAdjacentNodes();
         }
+
+        //// TODO
+        //private Node calculateAStar(Node start, Node target)
+        //{
+        //    nodeNeedsUpdate = false;
+        //    // make sure the lists are empty before beginning the algorithm
+        //    ClosedList.Clear();
+        //    OpenList.Clear();
+        //    ///////////////////////////////
+
+        //    OpenList.Add(start);
+        //    path.Add(start);
+
+        //    start.MovementCost = 0;                                     // initialize the movement cost (G)
+        //    int gScore = start.MovementCost;                            // g = MovementCost           
+        //    int fScore = start.MovementCost + start.Heuristic;          // F = G + H
+
+        //    while (OpenList != null)
+        //    {
+        //        int lowestCost = OpenList[0].TotalCost;  // TODO - should this be outside of while?
+        //        // get the node that has the lowest F cost (total cost)
+        //        foreach (Node node in OpenList)
+        //        {
+        //            if (node.TotalCost < lowestCost)
+        //                CurrentNode = node;
+        //        }
+
+        //        // move the current node from the open list to the closed list
+        //        OpenList.Remove(CurrentNode);
+        //        ClosedList.Add(CurrentNode);
+
+        //        foreach (Node neighbor in CurrentNode.AdjacentNodes)
+        //        {
+        //            bool found = false;
+        //            int potentialMovementCost = gScore + calculateMovementCost(CurrentNode, neighbor);
+
+        //            foreach (Node closedNode in ClosedList)
+        //            {
+        //                if (neighbor.id == closedNode.id)
+        //                {
+        //                    if (potentialMovementCost >= gScore)
+        //                        continue;
+        //                    found = true;
+        //                }
+        //            }
+
+        //            if (!found || potentialMovementCost < gScore)
+        //            {
+        //                path.Add(neighbor);     // TODO - should be currentnode?? // TODO - foreach??
+        //                gScore = potentialMovementCost;
+        //                fScore = gScore + calculateHeuristic(neighbor, target);
+        //            }
+        //        }
+
+        //        if (CurrentNode == target)
+        //                return (modifyPath(path, target));
+        //    }
+        //    return null;
+        //    // TODO - return failure condition
+        //    // on this line
+        //}
+
+        //// recursively make modifications to the path
+        //private Node modifyPath(List<Node> previousNode, Node currentNode)
+        //{
+        //    foreach (Node node in previousNode)
+        //    {
+        //        if (node.id == currentNode.id)
+        //        {
+        //            Node temp = modifyPath(previousNode, node);
+        //            //return (temp + currentNode);
+        //        }
+        //    }
+        //    return currentNode;
+        //}
 
         // update each node
         private void updateNodeList(GameTime gameTime, Player player, BaseGameEntity crosshair, List<Wall> wallList)
@@ -141,7 +259,7 @@ namespace SampleGame
             }
         }
 
-        // calculate the h (heuristic) value for A*
+        // calculate the h (Heuristic) value for A*
         private int calculateHeuristic(Node currentNode, Node targetNode)
         {
             // calculate based on the X/Y coordinates of the current node and the target node
@@ -214,7 +332,8 @@ namespace SampleGame
 
         public virtual void Draw(SpriteBatch sprites, SpriteFont font1)
         {
-            DrawingHelper.DrawFastLine(CurrentNode.Position, TargetNode.Position, Color.White);
+            if (StartNode != null)
+                DrawingHelper.DrawFastLine(StartNode.Position, TargetNode.Position, Color.White);
         }
     }
 }
