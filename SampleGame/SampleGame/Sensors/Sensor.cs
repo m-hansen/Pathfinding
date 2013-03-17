@@ -20,6 +20,11 @@ namespace SampleGame
 
         }
 
+        public virtual void Update(KeyboardState keyboard, Graph navagationGraph, Vector2 playerPos, float playerRot)
+        {
+
+        }
+
         public Vector2 CalculateRotatedMovement(Vector2 point, float rotation)
         {
             return Vector2.Transform(point, Matrix.CreateRotationZ(rotation));

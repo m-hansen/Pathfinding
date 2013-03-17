@@ -22,7 +22,7 @@ namespace SampleGame
 
         private List<InRangeInfo> inRangeInfoList = new List<InRangeInfo>();
 
-        public virtual void Update(KeyboardState keyboard, Graph navagationGraph, Vector2 playerPos, float playerRot)
+        public override void Update(KeyboardState keyboard, Graph navagationGraph, Vector2 playerPos, float playerRot)
         {
             inRangeInfoList.Clear();
             isInRange = false;
@@ -82,7 +82,7 @@ namespace SampleGame
 
         public override void Draw(SpriteBatch sprites, Vector2 center, SpriteFont font1)
         {
-            //if (Active)
+            if (Active)
             {
                 DrawingHelper.DrawCircle(new Vector2(center.X, center.Y), Radius, (isInRange ? Color.Red : Color.Green), false);
 

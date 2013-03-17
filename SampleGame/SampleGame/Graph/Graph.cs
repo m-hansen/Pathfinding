@@ -11,14 +11,21 @@ namespace SampleGame
 {
     public class Graph
     {
-        public List<Node> NodeList = new List<Node>();
+        public List<Node> NodeList = new List<Node>();          // the list of all nodes in the graph
 
-        int numHorizNodes = 16;
-        int numVertNodes = 12;
-        bool nodeNeedsUpdate = false;
+        // used for A*
+        public List<Node> OpenList = new List<Node>();          // contains a list of nodes that need to be checked
+        public List<Node> ClosedList = new List<Node>();        // contains a list of nodes that have been checked already
 
-        public Node CurrentNode;
-        public Node TargetNode;
+        int numHorizNodes = 16;                                 // number of horizontal nodes
+        int numVertNodes = 12;                                  // number of vertical nodes
+        bool nodeNeedsUpdate = false;                           // used to determine if we need to update the node or not
+        bool isOnOpenList = false;                              // used to determine if the node in on the open list
+        bool isOnClosedList = false;                            // used to determine if the node in on the open list
+
+        public Node StartNode;                                  // the node we begin our search at
+        public Node CurrentNode;                                // the current node to evaluate
+        public Node TargetNode;                                 // the target we wish to reach
 
         public Graph()
         {
@@ -39,6 +46,52 @@ namespace SampleGame
                     node.heuristic = calculateHeuristic(node, TargetNode);
                 }
             }
+
+
+            // ************************ BEGIN CHECKING LISTS ************************ //
+
+            // reset the flags before evaluating lists
+            isOnOpenList = false;
+            isOnClosedList = false;
+
+            // check to see if the current node is on the open list
+            foreach (Node openNode in OpenList)
+            {
+                if (CurrentNode == openNode)
+                    isOnOpenList = true;
+            }
+
+            // check to see if the current node is on the closed list
+            foreach (Node closedNode in ClosedList)
+            {
+                if (CurrentNode == closedNode)
+                    isOnClosedList = true;
+            }
+
+            // if the current node is not on either list
+            // then the current node's neighbors must have their parent node set to the current node
+            // in other words, current node's neighbors are the children nodes
+            if (!isOnClosedList && !isOnOpenList)
+            {
+                // first we must add the current node to the closed list
+                ClosedList.Add(CurrentNode);
+
+                // next we need to add nodes to the open list
+                foreach (Node node in CurrentNode.AdjacentNodes)
+                    OpenList.Add(node);
+
+                // TODO: should this iterate through each node in the closed list to update it?
+                // or should it just take the current node?
+
+                // TODO: should this iterate through the entire open list or use CurrentNode.adjacentnodes?
+
+                // now we set the parent node for each adjacent node
+                foreach (Node node in OpenList)
+                    node.ParentNode = CurrentNode;
+            }
+
+            // ************************ END CHECKING LISTS ************************ //
+
 
             // calculate the movement cost of each node
             foreach (Node potentialNode in CurrentNode.AdjacentNodes)

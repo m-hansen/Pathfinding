@@ -220,7 +220,7 @@ namespace SampleGame
             mouseStateCurrent = Mouse.GetState();
 
             // Update the player
-            player.Update(gameTime, keyboardStateCurrent, keyboardStatePrevious, mouseStateCurrent, mouseStatePrevious, wallList, agentAIList, crosshair, windowWidth, windowHeight);
+            player.Update(gameTime, keyboardStateCurrent, keyboardStatePrevious, mouseStateCurrent, mouseStatePrevious, wallList, navagationGraph, agentAIList, crosshair, windowWidth, windowHeight);
 
             // Update the navagation graph and all of its nodes
             navagationGraph.Update(gameTime, player, crosshair, wallList);
@@ -307,10 +307,10 @@ namespace SampleGame
 
             // *********************** DRAWING TEXT ON THE SCREEN FOR ASSIGNMENT ******************** //
 
-            spriteBatch.DrawString(font1, "Sensor Keys", new Vector2(700, 500), Color.Red, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 0);
-            spriteBatch.DrawString(font1, "Rangefinders: P", new Vector2(680, 520), Color.Red, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 0);
-            spriteBatch.DrawString(font1, "Agent Sensors: O", new Vector2(670, 540), Color.Red, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 0);
-            spriteBatch.DrawString(font1, "Pie-Slice Sensors: I", new Vector2(655, 560), Color.Red, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 0);
+            //spriteBatch.DrawString(font1, "Sensor Keys", new Vector2(700, 500), Color.Red, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 0);
+            //spriteBatch.DrawString(font1, "Rangefinders: P", new Vector2(680, 520), Color.Red, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 0);
+            //spriteBatch.DrawString(font1, "Agent Sensors: O", new Vector2(670, 540), Color.Red, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 0);
+            //spriteBatch.DrawString(font1, "Pie-Slice Sensors: I", new Vector2(655, 560), Color.Red, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 0);
            
             // *********************** END DRAWING TEXT ON THE SCREEN FOR ASSIGNMENT ***************** //
 
@@ -327,25 +327,48 @@ namespace SampleGame
 
             if (displayDebugInfo)
             {
-                string currentNodeText;
-                string targetNodeText;
+                string text;
 
-                DrawingHelper.DrawRectangle(new Rectangle(15, 15, 500, 110), alphaBlack, true);
+                // the background for debugging information
+                DrawingHelper.DrawRectangle(new Rectangle(15, 15, windowWidth - 30, windowHeight - 30), alphaBlack, true);
 
+                // title for the debug screen
+                spriteBatch.DrawString(font1, "DEBUG", new Vector2(windowWidth / 2 - 50, 20), Color.Red, 0.0f, Vector2.Zero, 1.5f, SpriteEffects.None, 1);
+
+                // display instructions for sensors
+                spriteBatch.DrawString(font1, "Sensor Keys", new Vector2(700, 480), Color.Red, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 0);
+                spriteBatch.DrawString(font1, "Rangefinders: P", new Vector2(680, 500), Color.DarkOrange, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 0);
+                spriteBatch.DrawString(font1, "Agent Sensors: O", new Vector2(670, 520), Color.DarkOrange, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 0);
+                spriteBatch.DrawString(font1, "Pie-Slice Sensors: I", new Vector2(655, 540), Color.DarkOrange, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 0);
+                spriteBatch.DrawString(font1, "Path Node Sensors: U", new Vector2(645, 560), Color.DarkOrange, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 0);
+
+                // display information about the player's location
                 spriteBatch.DrawString(font1, "Player Pos: " + player.Position.X + ", " + player.Position.Y, new Vector2(20, 20), Color.White, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 1);
                 spriteBatch.DrawString(font1, "Player Heading: " + player.Heading.X + ", " + player.Heading.Y, new Vector2(20, 40), Color.White, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 1);
 
                 // display info about the current node and its neighbors
-                currentNodeText = "Current Node ID: " + navagationGraph.CurrentNode.id + "       Neighbors: ";
+                text = "Current Node ID: " + navagationGraph.CurrentNode.id + "       Neighbors: ";
                 foreach (Node adjNode in navagationGraph.CurrentNode.AdjacentNodes)
-                    currentNodeText += adjNode.id + ", ";
-                spriteBatch.DrawString(font1, currentNodeText, new Vector2(20, 80), Color.White, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 1);
+                    text += adjNode.id + ", ";
+                spriteBatch.DrawString(font1, text, new Vector2(20, 80), Color.White, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 1);
 
                 // display info about the target node and its neighbors
-                targetNodeText = "Target Node ID: " + navagationGraph.TargetNode.id + "       Neighbors: ";
+                text = "Target Node ID: " + navagationGraph.TargetNode.id + "       Neighbors: ";
                 foreach (Node adjNode in navagationGraph.TargetNode.AdjacentNodes)
-                    targetNodeText += adjNode.id + ", ";
-                spriteBatch.DrawString(font1, targetNodeText, new Vector2(20, 100), Color.White, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 1);
+                    text += adjNode.id + ", ";
+                spriteBatch.DrawString(font1, text, new Vector2(20, 100), Color.White, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 1);
+
+                // display information about the open list for A*
+                text = "Open List: ";
+                foreach (Node node in navagationGraph.OpenList)
+                    text += node.id + ", ";
+                spriteBatch.DrawString(font1, text, new Vector2(20, 140), Color.White, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 1);
+
+                // display information about the closed list for A*
+                text = "Closed List: ";
+                foreach (Node node in navagationGraph.ClosedList)
+                    text += node.id + ", ";
+                spriteBatch.DrawString(font1, text, new Vector2(20, 160), Color.White, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 1);
             }
 
             spriteBatch.End();

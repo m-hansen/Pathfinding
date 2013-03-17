@@ -123,7 +123,7 @@ namespace SampleGame
         }
 
         public void Update(GameTime gameTime, KeyboardState keyboardStateCurrent, KeyboardState keyboardStatePrevious, 
-            MouseState mouseStateCurrent, MouseState mouseStatePrevious, List<Wall> wallList, List<GameAgent> agentAIList, BaseGameEntity crosshair,
+            MouseState mouseStateCurrent, MouseState mouseStatePrevious, List<Wall> wallList, Graph navagationGraph, List<GameAgent> agentAIList, BaseGameEntity crosshair,
             int windowWidth, int windowHeight)
         {
             float elapsedTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
@@ -189,8 +189,12 @@ namespace SampleGame
             // update each sensor
             foreach (Sensor sensor in sensorList)
             {
-                sensor.Update(keyboardStateCurrent, agentAIList, this.Position, this.Rotation);
+                if (sensor.Type == (int)Enums.SensorType.NodeSensor)
+                    sensor.Update(keyboardStateCurrent, navagationGraph, this.Position, this.Rotation);
+                else
+                    sensor.Update(keyboardStateCurrent, agentAIList, this.Position, this.Rotation);
             }
+
 
             base.Update(gameTime);
         }

@@ -22,6 +22,7 @@ namespace SampleGame
         public int heuristic;                                   // H - heuristic
         public int movementCost;                                // G - movement cost
         public int totalCost;                                   // F = G + H
+        public Node ParentNode;                                 // nodes in the A* algorithm will have a parent node
 
 
         public Node(Vector2 pos)
