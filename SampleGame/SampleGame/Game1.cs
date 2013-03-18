@@ -57,13 +57,13 @@ namespace SampleGame
 
             player = new Player();
             //player.AnimationInterval = TimeSpan.FromMilliseconds(100);          // next frame every 100 miliseconds
-            player.Position = new Vector2(windowWidth / 2, windowHeight / 2);   // setting position to center of screen
+            player.Position = new Vector2(windowWidth / 3, windowHeight / 2);   // setting position to center of screen
             player.RotationSpeed = 5.0f;                                        // rotate somewhat quick
             player.Speed = 4.0f;                                                // setting forward - backward speed
             player.InitializeSensors();                                         // initializes all sensors for the player object
 
             crosshair = new BaseGameEntity();
-            crosshair.Position = new Vector2(windowWidth / 2+1, windowHeight / 2+1); // TODO - slight offset to temporarly bypass a bug
+            crosshair.Position = new Vector2(windowWidth / 3+1, windowHeight / 2+1); // TODO - slight offset to temporarly bypass a bug
 
 
             // create the navagation graph
@@ -187,21 +187,21 @@ namespace SampleGame
                 //navagationGraph.NodeList.Add(node);
 
                 // Create a wall
-                //Point clickPos = new Point((int)mouseStateCurrent.X, (int)mouseStateCurrent.Y);
-                //foreach (Node node in navagationGraph.NodeList)
-                //{
-                //    // find the node that the mouse clicked
-                //    if (node.Cell.Contains(clickPos))
-                //    {
-                //        Wall wall = new Wall();
-                //        wall.LoadContent(this.Content, "Images\\wall");
-                //        wall.Position = node.Position;
-                //        wall.Bounds = new Rectangle(
-                //            (int)(wall.Position.X - wall.Origin.X * wall.Scale), (int)(wall.Position.Y - wall.Origin.Y * wall.Scale),
-                //            (int)(wall.Texture.Width), (int)(wall.Texture.Height));
-                //        wallList.Add(wall);
-                //    }
-                //}
+                Point clickPos = new Point((int)mouseStateCurrent.X, (int)mouseStateCurrent.Y);
+                foreach (Node node in navagationGraph.NodeList)
+                {
+                    // find the node that the mouse clicked
+                    if (node.Cell.Contains(clickPos))
+                    {
+                        Wall wall = new Wall();
+                        wall.LoadContent(this.Content, "Images\\wall");
+                        wall.Position = node.Position;
+                        wall.Bounds = new Rectangle(
+                            (int)(wall.Position.X - wall.Origin.X * wall.Scale), (int)(wall.Position.Y - wall.Origin.Y * wall.Scale),
+                            (int)(wall.Texture.Width), (int)(wall.Texture.Height));
+                        wallList.Add(wall);
+                    }
+                }
             }
 
             // Place crosshair at mouse position
@@ -233,6 +233,8 @@ namespace SampleGame
                 {
                     node.Draw(this.spriteBatch, font1);
                 }
+
+                navagationGraph.Draw(this.spriteBatch, font1);
             }
 
             foreach (GameAgent agent in agentAIList)
@@ -240,21 +242,10 @@ namespace SampleGame
                 agent.Draw(this.spriteBatch, font1);
             }
 
-   
-
             crosshair.Draw(this.spriteBatch, font1);    // draw the crosshair
 
-            // *********************** DRAWING TEXT ON THE SCREEN FOR ASSIGNMENT ******************** //
-
-            //spriteBatch.DrawString(font1, "Sensor Keys", new Vector2(700, 500), Color.Red, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 0);
-            //spriteBatch.DrawString(font1, "Rangefinders: P", new Vector2(680, 520), Color.Red, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 0);
-            //spriteBatch.DrawString(font1, "Agent Sensors: O", new Vector2(670, 540), Color.Red, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 0);
-            //spriteBatch.DrawString(font1, "Pie-Slice Sensors: I", new Vector2(655, 560), Color.Red, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 0);
-           
-            // *********************** END DRAWING TEXT ON THE SCREEN FOR ASSIGNMENT ***************** //
-
             player.Draw(this.spriteBatch, font1);       // draws the player object on the screen
-            navagationGraph.Draw(this.spriteBatch, font1);
+            
             spriteBatch.End();                          // stop drawing sprites
 
             // Draw debugging and info on top of everything else
@@ -276,9 +267,9 @@ namespace SampleGame
 
                 // display instructions for sensors
                 spriteBatch.DrawString(font1, "Sensor Keys", new Vector2(700, 480), Color.Red, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 0);
-                spriteBatch.DrawString(font1, "Rangefinders: P", new Vector2(680, 500), Color.DarkOrange, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 0);
-                spriteBatch.DrawString(font1, "Agent Sensors: O", new Vector2(670, 520), Color.DarkOrange, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 0);
-                spriteBatch.DrawString(font1, "Pie-Slice Sensors: I", new Vector2(655, 540), Color.DarkOrange, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 0);
+                spriteBatch.DrawString(font1, "Rangefinders: <DISABLED>", new Vector2(580, 500), Color.DarkOrange, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 0);
+                spriteBatch.DrawString(font1, "Agent Sensors: <DISABLED>", new Vector2(570, 520), Color.DarkOrange, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 0);
+                spriteBatch.DrawString(font1, "Pie-Slice Sensors: <DISABLED>", new Vector2(555, 540), Color.DarkOrange, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 0);
                 spriteBatch.DrawString(font1, "Path Node Sensors: U", new Vector2(645, 560), Color.DarkOrange, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 0);
 
                 // display information about the player's location
@@ -294,14 +285,14 @@ namespace SampleGame
                     spriteBatch.DrawString(font1, text, new Vector2(20, 80), Color.White, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 1);
                 }
 
-                // display info about the current node and its neighbors
-                if (navagationGraph.CurrentNode != null)
-                {
-                    text = "Current Node ID: " + navagationGraph.CurrentNode.id + "       Neighbors: ";
-                    foreach (Node adjNode in navagationGraph.CurrentNode.AdjacentNodes)
-                        text += adjNode.id + ", ";
-                    spriteBatch.DrawString(font1, text, new Vector2(20, 100), Color.White, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 1);
-                }
+                //// display info about the current node and its neighbors
+                //if (navagationGraph.CurrentNode != null)
+                //{
+                //    text = "Current Node ID: " + navagationGraph.CurrentNode.id + "       Neighbors: ";
+                //    foreach (Node adjNode in navagationGraph.CurrentNode.AdjacentNodes)
+                //        text += adjNode.id + ", ";
+                //    spriteBatch.DrawString(font1, text, new Vector2(20, 100), Color.White, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 1);
+                //}
 
                 // display info about the target node and its neighbors
                 if (navagationGraph.TargetNode != null)
@@ -323,6 +314,15 @@ namespace SampleGame
                 foreach (Node node in navagationGraph.ClosedList)
                     text += node.id + ", ";
                 spriteBatch.DrawString(font1, text, new Vector2(20, 180), Color.White, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 1);
+
+                // display the shortest path (A*)
+                if (navagationGraph.Path != null)
+                {
+                    text = "Shortest Path: ";
+                    foreach (Node node in navagationGraph.Path)
+                        text += node.id + ", ";
+                    spriteBatch.DrawString(font1, text, new Vector2(20, 220), Color.White, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 1);
+                }
             }
 
             spriteBatch.End();

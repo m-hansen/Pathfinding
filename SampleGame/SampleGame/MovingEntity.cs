@@ -25,7 +25,7 @@ namespace SampleGame
         public virtual void Update(GameTime gametime, Vector2 targetPosition)
         {
             // update the heading
-            RotateHeading(targetPosition);
+           // RotateHeading(targetPosition);
         }
 
         // Used to set the heading to the front of each moving entity

@@ -42,10 +42,7 @@ namespace SampleGame
             // y = mx+b, finding b (b = y - mx)
             float offset = !isVerticalLine ? endPoint.Y - endPoint.X * slope : 0;
 
-            //List<Wall> walls = wallList.Where(a => a.Type == (int)Enums.AgentType.Wall).ToList();
-
             // checking to see if the rangefinder is currently intersecting with a wall
-
             foreach (Wall wall in wallList)
             {
                 // NOTE: We want to check all the intersections and not break out of the loop early 

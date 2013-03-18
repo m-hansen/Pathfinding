@@ -25,6 +25,7 @@ namespace SampleGame
         // helper property for getting the width and height of the object.
         public int FrameWidth { get { return rects == null ? Texture.Width : rects[0].Width; } }
         public int FrameHeight { get { return rects == null ? Texture.Height : rects[0].Height; } }
+        public SteeringBehaviors Steering = new SteeringBehaviors();
 
         // the agent's current bounding rectangle, used for collision detection
         public Rectangle Bounds
@@ -71,7 +72,7 @@ namespace SampleGame
             }
         }
 
-        public virtual void Update(GameTime gametime) // TODO make override instead of virtual?
+        public virtual void Update(GameTime gametime)
         {
             // if the object is active on the screen
             if (Active)

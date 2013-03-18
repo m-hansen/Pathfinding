@@ -17,16 +17,11 @@ namespace SampleGame
         // used for A*
         public List<Node> OpenList = new List<Node>();          // contains a list of nodes that need to be checked
         public List<Node> ClosedList = new List<Node>();        // contains a list of nodes that have been checked already
-        List<Node> path = new List<Node>();
+        public List<Node> Path = new List<Node>();              // the shortest path (A*)
 
         int numHorizNodes = 16;                                 // number of horizontal nodes
         int numVertNodes = 12;                                  // number of vertical nodes
-
-        /* TODO should be false */
-        bool nodeNeedsUpdate = false;                            // used to determine if we need to update the node or not
-
-        bool isOnOpenList = false;                              // used to determine if the node in on the open list
-        bool isOnClosedList = false;                            // used to determine if the node in on the open list
+        bool nodeNeedsUpdate = false;                           // used to determine if we need to update the node or not
         bool found = false;
 
         public Node StartNode;                                  // the node we begin our search at
@@ -37,24 +32,34 @@ namespace SampleGame
         {
         }
 
-        public virtual void Update(GameTime gameTime, MouseState mouseStateCurrent, MouseState mouseStatePrevious, Player player, BaseGameEntity crosshair, List<Wall> wallList)
-        {           
-            // pressing the left mouse button sets the start node
-            /*if (mouseStateCurrent.LeftButton == ButtonState.Pressed && mouseStatePrevious.LeftButton != ButtonState.Pressed)
+        public void checkPlayerCollision(Player player)
+        {
+            if (Path.Count != 0)
             {
-                foreach (Node node in NodeList)
-                {
-                    if (node.Active && node.Cell.Contains(new Point((int)mouseStateCurrent.X, (int)mouseStateCurrent.Y)))
-                    {
-                        if (StartNode != null) 
-                            StartNode.Color = Color.LightGray;
-                        StartNode = node;
-                        CurrentNode = StartNode;            // set the current node tot he start node
-                        StartNode.MovementCost = 0;         // since this is the starting node, the movement cost must be zero
-                        nodeNeedsUpdate = true;
-                    }
-                }
-            }*/
+                if (Path[0].Cell.Contains(new Point((int)player.Position.X, (int)player.Position.Y)))
+                    Path.Remove(Path[0]);
+            }
+        }
+
+        public virtual void Update(GameTime gameTime, MouseState mouseStateCurrent, MouseState mouseStatePrevious, Player player, BaseGameEntity crosshair, List<Wall> wallList)
+        {
+            checkPlayerCollision(player);
+            // pressing the left mouse button sets the start node
+            //if (mouseStateCurrent.LeftButton == ButtonState.Pressed && mouseStatePrevious.LeftButton != ButtonState.Pressed)
+            //{
+            //    foreach (Node node in NodeList)
+            //    {
+            //        if (node.Active && node.Cell.Contains(new Point((int)mouseStateCurrent.X, (int)mouseStateCurrent.Y)))
+            //        {
+            //            if (StartNode != null) 
+            //                StartNode.Color = Color.LightGray;
+            //            StartNode = node;
+            //            CurrentNode = StartNode;            // set the current node tot he start node
+            //            StartNode.MovementCost = 0;         // since this is the starting node, the movement cost must be zero
+            //            nodeNeedsUpdate = true;
+            //        }
+            //    }
+            //}
 
             // pressing the right mouse button sets the target node
             if (mouseStateCurrent.RightButton == ButtonState.Pressed && mouseStatePrevious.RightButton != ButtonState.Pressed)
@@ -87,6 +92,12 @@ namespace SampleGame
             updateNodeList(gameTime, player, crosshair, wallList);
             addAdjacentNodes();
 
+            if (StartNode == TargetNode && TargetNode != null && TargetNode.Active)
+            {
+                Path.Clear();
+                Path.Add(TargetNode);
+            }
+
             // run the A* algorithm
             if (nodeNeedsUpdate && TargetNode != null && StartNode != null && StartNode != TargetNode)
                 calculateAStar();
@@ -102,10 +113,12 @@ namespace SampleGame
             // clear the lists
             OpenList.Clear();
             ClosedList.Clear();
+            Path.Clear();
 
             // initialize F and G
             foreach (Node node in NodeList)
             {
+                node.ParentNode = null;
                 node.MovementCost = 0;
                 node.TotalCost = 0;
                 node.Color = Color.LightGray;
@@ -126,6 +139,20 @@ namespace SampleGame
             // continue to calculate a path until the target is reached
             while (!found)
                 calculatePath();
+
+            // add the path to a list of nodes (Note: nodes will be added in reverse order)
+            if (found)
+            {
+                Node node = TargetNode;
+                Path = new List<Node>();
+                do
+                {
+                    Path.Add(node);
+                    node = node.ParentNode;
+                } while (node.ParentNode != null && node != null);
+
+                Path.Reverse();     // reverse the Path list (this will lead from start to target)
+            }
         }
 
         private void calculatePath()
@@ -184,70 +211,6 @@ namespace SampleGame
             }
         }
 
-        //private void checkLists()
-        //{
-        //    if (CurrentNode == TargetNode)
-        //        return;
-
-        //    // reset the flags before evaluating lists
-        //    isOnOpenList = false;
-        //    isOnClosedList = false;
-
-        //    // check to see if the current node is on the open list
-        //    foreach (Node openNode in OpenList)
-        //    {
-        //        if (CurrentNode == openNode)
-        //            isOnOpenList = true;
-        //    }
-
-        //    // check to see if the current node is on the closed list
-        //    foreach (Node closedNode in ClosedList)
-        //    {
-        //        if (CurrentNode == closedNode)
-        //            isOnClosedList = true;
-        //    }
-
-        //    // if the current node is not on either list
-        //    // then the current node's neighbors must have their parent node set to the current node
-        //    // in other words, current node's neighbors are the children nodes
-        //    if (!isOnClosedList && !isOnOpenList)
-        //    {
-        //        // first we must add the current node to the closed list
-        //        ClosedList.Add(CurrentNode);
-
-        //        // next we need to add nodes to the open list
-        //        foreach (Node node in CurrentNode.AdjacentNodes)
-        //        {
-        //            OpenList.Add(node);                                                 // add the node to the open list
-        //            node.ParentNode = CurrentNode;                                      // set the node's parent to the current node
-        //            node.MovementCost = calculateMovementCost(CurrentNode, node);       // calculate the movement cost from one node to another
-        //            node.TotalCost = node.MovementCost + node.Heuristic;                // calculate the F value (F = G + H)
-        //        }
-        //    }
-
-        //    // check open list for reparenting
-        //    foreach (Node node in OpenList)
-        //    {
-        //        int potentialGScore = CurrentNode.MovementCost + node.MovementCost;
-        //        if (potentialGScore < node.MovementCost)
-        //        {
-        //            // reparent
-        //            node.ParentNode = CurrentNode;
-        //        }
-        //    }
-
-        //    // search for the lowest F value
-        //    CurrentNode = getSmallestFNode();
-
-        //    // move the smallest F value node from the open list to the closed list
-        //    OpenList.Remove(CurrentNode);
-        //    ClosedList.Add(CurrentNode);
-
-        //    //checkLists();
-        //}
-
-        // iterates through each node in the open list and returns the one with the smallest total cost (the F value) //todo
-
         private Node getSmallestFNode()
         {
             int lowestVal = int.MaxValue;           // this variable should be initialized to the largest value possible
@@ -273,36 +236,6 @@ namespace SampleGame
                 node.Update(gameTime, player, crosshair, wallList);
             }
         }
-
-        //// update the target node
-        //private void updateTargetNode(BaseGameEntity crosshair)
-        //{
-        //    //nodeNeedsUpdate = false;
-
-        //    foreach (Node node in NodeList)
-        //    {
-        //        // check for target node
-        //        if (node != TargetNode && node.Cell.Contains(new Point((int)crosshair.Position.X, (int)crosshair.Position.Y)))
-        //        {
-        //            TargetNode = node;
-        //            //nodeNeedsUpdate = true;
-        //        }
-        //    }
-        //}
-
-        //// update the current node
-        //private void updateCurrentNode(Player player)
-        //{
-        //    CurrentNode = NodeList[0];
-        //    //foreach (Node node in NodeList)
-        //    //{
-        //    //    // check for current node
-        //    //    if (node.Cell.Contains(new Point((int)player.Position.X, (int)player.Position.Y)))
-        //    //    {
-        //    //        CurrentNode = node;
-        //    //    }
-        //    //}
-        //}
 
         // calculate the h (Heuristic) value for A*
         private int calculateHeuristic(Node currentNode, Node targetNode)
@@ -356,7 +289,7 @@ namespace SampleGame
                 foreach (Node neighbor in NodeList)
                 {
                     // check left, right, top, and bottom nodes
-                    if ((node != neighbor) && (!node.Equals(neighbor)) && (neighbor.id == (node.id + 1) || neighbor.id == (node.id - 1) ||  // left/right
+                    if ((!node.Equals(neighbor)) && (neighbor.id == (node.id + 1) || neighbor.id == (node.id - 1) ||  // left/right
                         neighbor.id == (node.id + numHorizNodes) || neighbor.id == (node.id - numHorizNodes) ||                             // top/bottom
                         neighbor.id == (node.id - (numHorizNodes + 1)) || neighbor.id == (node.id - (numHorizNodes - 1)) ||                 // bottom right/left
                         neighbor.id == (node.id + (numHorizNodes + 1)) || neighbor.id == (node.id + (numHorizNodes - 1))))                  // top right/left
@@ -382,12 +315,6 @@ namespace SampleGame
                             node.AdjacentNodes.Add(neighbor);
                         }
 
-                             //&& 
-                        //   (!(node.id % numHorizNodes == 0 && neighbor.id == (node.id - 1) && neighbor.id == (node.id + (numHorizNodes - 1)) && neighbor.id == (node.id - (numHorizNodes + 1))) || // special left case
-                        //   !(node.id % numHorizNodes == numHorizNodes - 1 && neighbor.id == (node.id + 1)) && neighbor.id == (node.id + (numHorizNodes + 1)) && neighbor.id == (node.id - (numHorizNodes - 1)) || // special right case
-                        //   !(node.id < numVertNodes && neighbor.id == (node.id - numHorizNodes) && neighbor.id == (node.id - numHorizNodes - 1) && neighbor.id == (node.id - numHorizNodes + 1)) || // top of grid
-                        //   !(node.id >= ((numVertNodes * numHorizNodes) - numHorizNodes) && neighbor.id == (node.id + numHorizNodes) && neighbor.id == (node.id + numHorizNodes - 1) && neighbor.id == (node.id + numHorizNodes + 1)))) // bottom of grid
-
                         // remove an inactive node
                         else if (found && !node.Active || !neighbor.Active)
                             node.AdjacentNodes.Remove(neighbor);
@@ -400,13 +327,21 @@ namespace SampleGame
         {
             if (found && TargetNode != StartNode)
             {
-                Node node = TargetNode; // start at the final node and work back to the start
-                do
+                foreach (Node pathNode in Path)
                 {
-                    DrawingHelper.DrawFastLine(node.Position, node.ParentNode.Position, Color.White);
-                    node.Color = Color.Purple;
-                    node = node.ParentNode;
-                } while (node.ParentNode != null && node != null);
+                    DrawingHelper.DrawFastLine(pathNode.Position, pathNode.ParentNode.Position, Color.White);
+                    pathNode.Color = Color.Purple;
+
+                }
+
+                // debug to display the search space
+                //foreach (Node node1 in NodeList)
+                //{
+                //    if (node1.Active && (node1.MovementCost != 0 || node1 == TargetNode || node1 == StartNode))
+                //    {
+                //        DrawingHelper.DrawRectangle(node1.Cell, Color.LightBlue, true);
+                //    }
+                //}
             }
         }
     }
