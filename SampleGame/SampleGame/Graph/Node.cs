@@ -59,7 +59,7 @@ namespace SampleGame
             }
 
             // calculate the f (total cost) value
-            TotalCost = MovementCost + Heuristic;   // F = G + H
+            //TotalCost = MovementCost + Heuristic;   // F = G + H
         }
 
         public virtual void Draw(SpriteBatch sprites, SpriteFont font1)

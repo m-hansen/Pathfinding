@@ -7,8 +7,6 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
 using Drawing;
 
-// TODO - fix intersection point to reflect bounds of wall and not a horizontal line
-
 namespace SampleGame
 {
     public class RangeFinder : Sensor
@@ -23,7 +21,7 @@ namespace SampleGame
         private Vector2 endPoint;               // the point to where the rangefinder stops
         private double intersectionDistance;    // if the range finder is currently intersecting an agent
 
-        public override void Update(KeyboardState keyboard, List<GameAgent> agentAIList, Vector2 playerPos, float playerRot)
+        public override void Update(KeyboardState keyboard, List<Wall> wallList, Vector2 playerPos, float playerRot)
         {
             // reinitializing no intersection and the intersection distance 
             intersectionDistance = 0.0f;
@@ -44,36 +42,37 @@ namespace SampleGame
             // y = mx+b, finding b (b = y - mx)
             float offset = !isVerticalLine ? endPoint.Y - endPoint.X * slope : 0;
 
-            List<GameAgent> walls = agentAIList.Where(a => a.Type == (int)Enums.AgentType.Wall).ToList();
+            //List<Wall> walls = wallList.Where(a => a.Type == (int)Enums.AgentType.Wall).ToList();
 
             // checking to see if the rangefinder is currently intersecting with a wall
-            foreach (GameAgent agent in walls)
+
+            foreach (Wall wall in wallList)
             {
                 // NOTE: We want to check all the intersections and not break out of the loop early 
                 // incase the rangefinder is intersecting multiple agents
-                if (CheckIntersection(agent, isVerticalLine, slope, offset, playerPos, endPoint))
-                {
-                    isIntersecting = true;
-                }
+                CheckIntersection(wall, isVerticalLine, slope, offset, playerPos, endPoint);
             }
         }
 
-        private bool CheckIntersection(GameAgent agent, bool isVerticalLine, float slope, float offset, Vector2 rfStartPoint, Vector2 rfEndPoint)
+        private void CheckIntersection(Wall wall, bool isVerticalLine, float slope, float offset, Vector2 rfStartPoint, Vector2 rfEndPoint)
         {
             // NOTE: drawing lines backwards so that higher values are always on the top and right
             // making it easier for calculation.
-            Rectangle agentBounds = agent.Bounds;
+            Rectangle wallBounds = wall.Bounds;
 
-            Vector2 bottomLeft = new Vector2(agentBounds.Left, agentBounds.Top);
-            Vector2 bottomRight = new Vector2(agentBounds.Left + agentBounds.Width, agentBounds.Top);
-            Vector2 topLeft = new Vector2(agentBounds.Left, agentBounds.Top + agentBounds.Height);
+            Vector2 bottomLeft = new Vector2(wallBounds.Left, wallBounds.Top);
+            Vector2 bottomRight = new Vector2(wallBounds.Left + wallBounds.Width, wallBounds.Top);
+            Vector2 topLeft = new Vector2(wallBounds.Left, wallBounds.Top + wallBounds.Height);
             Vector2 topRight = new Vector2(bottomRight.X, topLeft.Y);
-            
-            return
-                IsLineIntersection(topLeft, topRight, isVerticalLine, slope, offset, rfStartPoint, rfEndPoint) ||
-                IsLineIntersection(bottomLeft, bottomRight, isVerticalLine, slope, offset, rfStartPoint, rfEndPoint) ||
-                IsLineIntersection(bottomLeft, topLeft, isVerticalLine, slope, offset, rfStartPoint, rfEndPoint) ||
-                IsLineIntersection(bottomRight, topRight, isVerticalLine, slope, offset, rfStartPoint, rfEndPoint);
+
+            if (IsLineIntersection(topLeft, topRight, isVerticalLine, slope, offset, rfStartPoint, rfEndPoint))
+                isIntersecting = true;
+            if (IsLineIntersection(bottomLeft, bottomRight, isVerticalLine, slope, offset, rfStartPoint, rfEndPoint))
+                isIntersecting = true;
+            if (IsLineIntersection(bottomLeft, topLeft, isVerticalLine, slope, offset, rfStartPoint, rfEndPoint))
+                isIntersecting = true;
+            if (IsLineIntersection(bottomRight, topRight, isVerticalLine, slope, offset, rfStartPoint, rfEndPoint))
+                isIntersecting = true;
         }
 
         private bool IsLineIntersection(Vector2 targetStartPoint, Vector2 targetEndPoint, bool isVerticalLine, float slope, float offset, Vector2 rfStartPoint, Vector2 rfEndPoint)
@@ -158,11 +157,11 @@ namespace SampleGame
         }
 
         public override void Draw(SpriteBatch sprites, Vector2 startPoint, SpriteFont font1)
-        {
+        { 
             if (Active)
             {
                 DrawingHelper.DrawFastLine(startPoint, isIntersecting ? intersectingPoint : endPoint, isIntersecting ? Color.Red : Color.Yellow);
-
+               
                 if (isIntersecting)
                 {
                     // draw only the distance

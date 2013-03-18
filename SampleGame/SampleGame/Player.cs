@@ -191,6 +191,8 @@ namespace SampleGame
             {
                 if (sensor.Type == (int)Enums.SensorType.NodeSensor)
                     sensor.Update(keyboardStateCurrent, navagationGraph, this.Position, this.Rotation);
+                else if (sensor.Type == (int)Enums.SensorType.RangeFinder)
+                    sensor.Update(keyboardStateCurrent, wallList, this.Position, this.Rotation);
                 else
                     sensor.Update(keyboardStateCurrent, agentAIList, this.Position, this.Rotation);
             }

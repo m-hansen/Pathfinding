@@ -135,6 +135,7 @@ namespace SampleGame
                     }
                 }
             }
+            navagationGraph.CurrentNode = navagationGraph.NodeList[0];  // initialize the current node
 
             // *********************** END MAP GENERATION FOR ASSIGNMENT 2 *********************** //
         }
@@ -285,16 +286,16 @@ namespace SampleGame
                 spriteBatch.DrawString(font1, "Player Heading: " + player.Heading.X + ", " + player.Heading.Y, new Vector2(20, 40), Color.White, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 1);
 
                 // display info about the current node and its neighbors
-                text = "Current Node ID: " + navagationGraph.CurrentNode.id + "       Neighbors: ";
-                foreach (Node adjNode in navagationGraph.CurrentNode.AdjacentNodes)
-                    text += adjNode.id + ", ";
-                spriteBatch.DrawString(font1, text, new Vector2(20, 80), Color.White, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 1);
+                //text = "Current Node ID: " + navagationGraph.CurrentNode.id + "       Neighbors: ";
+                //foreach (Node adjNode in navagationGraph.CurrentNode.AdjacentNodes)
+                //    text += adjNode.id + ", ";
+                //spriteBatch.DrawString(font1, text, new Vector2(20, 80), Color.White, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 1);
 
                 // display info about the target node and its neighbors
-                text = "Target Node ID: " + navagationGraph.TargetNode.id + "       Neighbors: ";
-                foreach (Node adjNode in navagationGraph.TargetNode.AdjacentNodes)
-                    text += adjNode.id + ", ";
-                spriteBatch.DrawString(font1, text, new Vector2(20, 100), Color.White, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 1);
+                //text = "Target Node ID: " + navagationGraph.TargetNode.id + "       Neighbors: ";
+                //foreach (Node adjNode in navagationGraph.TargetNode.AdjacentNodes)
+                //    text += adjNode.id + ", ";
+                //spriteBatch.DrawString(font1, text, new Vector2(20, 100), Color.White, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 1);
 
                 // display information about the open list for A*
                 text = "Open List: ";

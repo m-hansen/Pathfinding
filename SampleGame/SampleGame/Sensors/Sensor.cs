@@ -20,6 +20,11 @@ namespace SampleGame
 
         }
 
+        public virtual void Update(KeyboardState keyboard, List<Wall> wallList, Vector2 playerPos, float playerRot)
+        {
+
+        }
+
         public virtual void Update(KeyboardState keyboard, Graph navagationGraph, Vector2 playerPos, float playerRot)
         {
 

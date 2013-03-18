@@ -23,12 +23,11 @@ namespace SampleGame
         int numVertNodes = 12;                                  // number of vertical nodes
 
         /* TODO should be false */
-        bool nodeNeedsUpdate = true;                           // used to determine if we need to update the node or not
-
-
+        bool nodeNeedsUpdate = false;                            // used to determine if we need to update the node or not
 
         bool isOnOpenList = false;                              // used to determine if the node in on the open list
         bool isOnClosedList = false;                            // used to determine if the node in on the open list
+        bool found = false;
 
         public Node StartNode;                                  // the node we begin our search at
         public Node CurrentNode;                                // the current node to evaluate
@@ -40,6 +39,8 @@ namespace SampleGame
 
         public virtual void Update(GameTime gameTime, MouseState mouseStateCurrent, MouseState mouseStatePrevious, Player player, BaseGameEntity crosshair, List<Wall> wallList)
         {
+            //nodeNeedsUpdate = false;
+            
             // pressing the left mouse button sets the start node
             if (mouseStateCurrent.LeftButton == ButtonState.Pressed && mouseStatePrevious.LeftButton != ButtonState.Pressed)
             {
@@ -50,6 +51,9 @@ namespace SampleGame
                         if (StartNode != null) 
                             StartNode.Color = Color.LightGray;
                         StartNode = node;
+                        CurrentNode = StartNode;            // set the current node tot he start node
+                        StartNode.MovementCost = 0;         // since this is the starting node, the movement cost must be zero
+                        nodeNeedsUpdate = true;
                     }
                 }
             }
@@ -64,6 +68,7 @@ namespace SampleGame
                         if (TargetNode != null)
                             TargetNode.Color = Color.LightGray;
                         TargetNode = node;
+                        nodeNeedsUpdate = true;
                     }
                 }
             }
@@ -74,24 +79,142 @@ namespace SampleGame
             if (TargetNode != null)
                 TargetNode.Color = Color.DarkOrange;
 
+            // update the nodes and their neighbors
             updateNodeList(gameTime, player, crosshair, wallList);
-            updateTargetNode(crosshair);
-            updateCurrentNode(player);
-            //if (nodeNeedsUpdate)
-                //calculateAStar(StartNode, TargetNode);
+            addAdjacentNodes();
 
-            // get the Heuristic value for each node
-            if (nodeNeedsUpdate)
+
+            // ******************************** BEGIN A* ********************************* //
+
+            //updateTargetNode(crosshair);
+            //updateCurrentNode(player);
+            //if (nodeNeedsUpdate)
+            //calculateAStar(StartNode, TargetNode);
+
+            // run the A* algorithm
+            if (nodeNeedsUpdate && TargetNode != null && StartNode != null)
+                calculateAStar();
+
+            // ******************************** END A* ********************************* //
+
+        }
+
+        // clear lists, reset node costs, and calculate heuristic values
+        private void initializeAStar()
+        {
+            // reset flags
+            found = false;
+            nodeNeedsUpdate = false;
+
+            // clear the lists
+            OpenList.Clear();
+            ClosedList.Clear();
+
+            // initialize F and G
+            foreach (Node node in NodeList)
             {
-                // calculate the H value
-                foreach (Node node in NodeList)
-                {
-                    node.Heuristic = calculateHeuristic(node, TargetNode);
-                }
+                node.MovementCost = 0;
+                node.TotalCost = 0;
             }
 
+            // get the Heuristic value for each node
+            foreach (Node node in NodeList)
+            {
+                node.Heuristic = calculateHeuristic(node, TargetNode);
+            }
+        }
 
-            // ************************ BEGIN CHECKING LISTS ************************ //
+        private void calculateAStar()
+        {
+            // clear lists, reset node costs, and calculate heuristic values
+            initializeAStar();
+
+            // reset the flags before evaluating lists
+            isOnOpenList = false;
+            isOnClosedList = false;
+
+            // check to see if the current node is on the open list
+            foreach (Node openNode in OpenList)
+            {
+                if (CurrentNode == openNode)
+                    isOnOpenList = true;
+            }
+
+            // check to see if the current node is on the closed list
+            foreach (Node closedNode in ClosedList)
+            {
+                if (CurrentNode == closedNode)
+                    isOnClosedList = true;
+            }
+
+            calculatePath();      
+        }
+
+        private void calculatePath()
+        {
+            if (!found)
+            {
+                // check all the adjacent nodes
+                foreach (Node neighbor in CurrentNode.AdjacentNodes)
+                {
+                    setNodeValues(neighbor);
+                }
+
+                // move from open list to closed list
+                OpenList.Remove(CurrentNode);
+                ClosedList.Add(CurrentNode);
+
+                // set the current node to the node with the smallest total (F) value
+                CurrentNode = getSmallestFNode();
+            }
+        }
+
+        private void setNodeValues(Node neighbor)
+        {
+            // check for null case
+            if (neighbor == null)
+                return;
+
+            // check for end case
+            if (neighbor == TargetNode)
+            {
+                TargetNode.ParentNode = CurrentNode;        // set the parent node
+                found = true;                               // we have found our target node!
+                return;
+            }
+
+            // check to make sure the node is not on our closed list
+            if (!ClosedList.Contains(neighbor))
+            {
+                // check to see if it is on the open list
+                if (OpenList.Contains(neighbor))
+                {
+                    // calculate a new movement cost (G)
+                    int gcost = CurrentNode.MovementCost + neighbor.MovementCost;
+
+                    // check for a lower movement cost
+                    if (gcost < neighbor.MovementCost)
+                    {
+                        neighbor.ParentNode = CurrentNode;                                      // set the new parent node
+                        neighbor.MovementCost = gcost;                                          // set the new movement cost (G)
+                        neighbor.TotalCost = calculateTotalCost(neighbor);                      // set the new total cost (F)
+                    }
+                }
+                else        
+                {
+                    // not on open or closed list
+                    neighbor.ParentNode = CurrentNode;                                          // set parent
+                    neighbor.MovementCost = CurrentNode.MovementCost + neighbor.MovementCost;   // set movement cost (G)
+                    neighbor.TotalCost = calculateTotalCost(neighbor);                          // set total cost (F)
+                    OpenList.Add(neighbor);                                                     // add the node to the open list
+                }
+            }
+        }
+
+        private void checkLists()
+        {
+            if (CurrentNode == TargetNode)
+                return;
 
             // reset the flags before evaluating lists
             isOnOpenList = false;
@@ -121,105 +244,52 @@ namespace SampleGame
 
                 // next we need to add nodes to the open list
                 foreach (Node node in CurrentNode.AdjacentNodes)
-                    OpenList.Add(node);
-
-                // TODO: should this iterate through each node in the closed list to update it?
-                // or should it just take the current node?
-
-                // TODO: should this iterate through the entire open list or use CurrentNode.adjacentnodes?
-
-                // now we set the parent node for each adjacent node
-                foreach (Node node in OpenList)
-                    node.ParentNode = CurrentNode;
+                {
+                    OpenList.Add(node);                                                 // add the node to the open list
+                    node.ParentNode = CurrentNode;                                      // set the node's parent to the current node
+                    node.MovementCost = calculateMovementCost(CurrentNode, node);       // calculate the movement cost from one node to another
+                    node.TotalCost = node.MovementCost + node.Heuristic;                // calculate the F value (F = G + H)
+                }
             }
 
-            // ************************ END CHECKING LISTS ************************ //
-
-
-            // calculate the movement cost of each node
-            foreach (Node potentialNode in CurrentNode.AdjacentNodes)
+            // check open list for reparenting
+            foreach (Node node in OpenList)
             {
-                potentialNode.MovementCost = calculateMovementCost(CurrentNode, potentialNode);
+                int potentialGScore = CurrentNode.MovementCost + node.MovementCost;
+                if (potentialGScore < node.MovementCost)
+                {
+                    // reparent
+                    node.ParentNode = CurrentNode;
+                }
             }
 
-            // update the adjacent nodes
-            addAdjacentNodes();
+            // search for the lowest F value
+            CurrentNode = getSmallestFNode();
+
+            // move the smallest F value node from the open list to the closed list
+            OpenList.Remove(CurrentNode);
+            ClosedList.Add(CurrentNode);
+
+            //checkLists();
         }
 
-        //// TODO
-        //private Node calculateAStar(Node start, Node target)
-        //{
-        //    nodeNeedsUpdate = false;
-        //    // make sure the lists are empty before beginning the algorithm
-        //    ClosedList.Clear();
-        //    OpenList.Clear();
-        //    ///////////////////////////////
+        // iterates through each node in the open list and returns the one with the smallest total cost (the F value)
+        private Node getSmallestFNode()
+        {
+            int lowestVal = int.MaxValue;           // this variable should be initialized to the largest value possible
+            Node smallestFNode = null;              // we will use this to return the smallest node
 
-        //    OpenList.Add(start);
-        //    path.Add(start);
+            foreach (Node node in OpenList)
+            {
+                if (node.TotalCost < lowestVal)
+                {
+                    lowestVal = node.TotalCost;     // set the lowest value to the nodes F value (total cost)
+                    smallestFNode = node;           // set the smallest node to potentially be returned
+                }
+            }
 
-        //    start.MovementCost = 0;                                     // initialize the movement cost (G)
-        //    int gScore = start.MovementCost;                            // g = MovementCost           
-        //    int fScore = start.MovementCost + start.Heuristic;          // F = G + H
-
-        //    while (OpenList != null)
-        //    {
-        //        int lowestCost = OpenList[0].TotalCost;  // TODO - should this be outside of while?
-        //        // get the node that has the lowest F cost (total cost)
-        //        foreach (Node node in OpenList)
-        //        {
-        //            if (node.TotalCost < lowestCost)
-        //                CurrentNode = node;
-        //        }
-
-        //        // move the current node from the open list to the closed list
-        //        OpenList.Remove(CurrentNode);
-        //        ClosedList.Add(CurrentNode);
-
-        //        foreach (Node neighbor in CurrentNode.AdjacentNodes)
-        //        {
-        //            bool found = false;
-        //            int potentialMovementCost = gScore + calculateMovementCost(CurrentNode, neighbor);
-
-        //            foreach (Node closedNode in ClosedList)
-        //            {
-        //                if (neighbor.id == closedNode.id)
-        //                {
-        //                    if (potentialMovementCost >= gScore)
-        //                        continue;
-        //                    found = true;
-        //                }
-        //            }
-
-        //            if (!found || potentialMovementCost < gScore)
-        //            {
-        //                path.Add(neighbor);     // TODO - should be currentnode?? // TODO - foreach??
-        //                gScore = potentialMovementCost;
-        //                fScore = gScore + calculateHeuristic(neighbor, target);
-        //            }
-        //        }
-
-        //        if (CurrentNode == target)
-        //                return (modifyPath(path, target));
-        //    }
-        //    return null;
-        //    // TODO - return failure condition
-        //    // on this line
-        //}
-
-        //// recursively make modifications to the path
-        //private Node modifyPath(List<Node> previousNode, Node currentNode)
-        //{
-        //    foreach (Node node in previousNode)
-        //    {
-        //        if (node.id == currentNode.id)
-        //        {
-        //            Node temp = modifyPath(previousNode, node);
-        //            //return (temp + currentNode);
-        //        }
-        //    }
-        //    return currentNode;
-        //}
+            return smallestFNode;
+        }
 
         // update each node
         private void updateNodeList(GameTime gameTime, Player player, BaseGameEntity crosshair, List<Wall> wallList)
@@ -233,7 +303,7 @@ namespace SampleGame
         // update the target node
         private void updateTargetNode(BaseGameEntity crosshair)
         {
-            nodeNeedsUpdate = false;
+            //nodeNeedsUpdate = false;
 
             foreach (Node node in NodeList)
             {
@@ -241,7 +311,7 @@ namespace SampleGame
                 if (node != TargetNode && node.Cell.Contains(new Point((int)crosshair.Position.X, (int)crosshair.Position.Y)))
                 {
                     TargetNode = node;
-                    nodeNeedsUpdate = true;
+                    //nodeNeedsUpdate = true;
                 }
             }
         }
@@ -249,14 +319,15 @@ namespace SampleGame
         // update the current node
         private void updateCurrentNode(Player player)
         {
-            foreach (Node node in NodeList)
-            {
-                // check for current node
-                if (node.Cell.Contains(new Point((int)player.Position.X, (int)player.Position.Y)))
-                {
-                    CurrentNode = node;
-                }
-            }
+            CurrentNode = NodeList[0];
+            //foreach (Node node in NodeList)
+            //{
+            //    // check for current node
+            //    if (node.Cell.Contains(new Point((int)player.Position.X, (int)player.Position.Y)))
+            //    {
+            //        CurrentNode = node;
+            //    }
+            //}
         }
 
         // calculate the h (Heuristic) value for A*
@@ -277,7 +348,7 @@ namespace SampleGame
         private int calculateMovementCost(Node currentNode, Node targetNode)
         {
             // the node is directly horizontal or vertical and should have a movement cost of 10
-            if (currentNode.id == (targetNode.id + 1) || currentNode.id == (targetNode.id - 1) ||  // left/right
+            if (currentNode.id == (targetNode.id + 1) || currentNode.id == (targetNode.id - 1) ||   // left/right
                 currentNode.id == (targetNode.id + 16) || currentNode.id == (targetNode.id - 16))   // top/bottom
                 return 10;
             
@@ -288,6 +359,12 @@ namespace SampleGame
 
             // no movement cost because the nodes are the same (or an error occured)
             return 0;
+        }
+
+        // calculate the F (total) cost for A*
+        private int calculateTotalCost(Node node)
+        {
+            return (node.MovementCost + node.Heuristic);    // F = G + H
         }
 
         // add a node to the list
@@ -332,8 +409,18 @@ namespace SampleGame
 
         public virtual void Draw(SpriteBatch sprites, SpriteFont font1)
         {
-            if (StartNode != null)
+            if (StartNode != null && TargetNode != null)
                 DrawingHelper.DrawFastLine(StartNode.Position, TargetNode.Position, Color.White);
+
+            if (found)
+            {
+                Node node = TargetNode; // start at the final node and work back to the start
+                do
+                {
+                    DrawingHelper.DrawFastLine(node.Position, node.ParentNode.Position, Color.White);
+                    node = node.ParentNode;
+                } while (node != null);
+            }
         }
     }
 }
