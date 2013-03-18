@@ -41,15 +41,6 @@ namespace SampleGame
 
         public virtual void Update(GameTime gametime, Player player, BaseGameEntity crosshair, List<Wall> wallList)
         {
-            // Change the color of a node based on what entity is near
-            //if (Cell.Contains(new Point((int)player.Position.X, (int)player.Position.Y)))
-            //    Color = Color.Green;
-            //else if (Cell.Contains(new Point((int)crosshair.Position.X, (int)crosshair.Position.Y)))
-            //    Color = Color.DarkOrange;
-            //else
-            //    Color = Color.LightGray;
-
-
             // check if the cell contains a wall
             foreach (Wall wall in wallList)
             {
@@ -57,9 +48,6 @@ namespace SampleGame
                 if (Cell.Contains(new Point((int)wall.Position.X, (int)wall.Position.Y)))
                     Active = false;
             }
-
-            // calculate the f (total cost) value
-            //TotalCost = MovementCost + Heuristic;   // F = G + H
         }
 
         public virtual void Draw(SpriteBatch sprites, SpriteFont font1)

@@ -13,7 +13,7 @@ namespace SampleGame
         //public float RotationSpeed = 1.0f;              // how fast the object should rotate
         //public float ZLayer;                            // depth of object
         //public Color Color = Color.White;               // max RGB of the image to draw
-        public int Type;                                // type of agent (wall, etc)
+        public int Type;                                  // type of agent (wall, etc)
 
         public int TotalFrames { get; private set; }    // the total frames in the image
         public TimeSpan AnimationInterval;              // how often the frames are changed
