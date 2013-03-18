@@ -38,15 +38,13 @@ namespace SampleGame
         }
 
         public virtual void Update(GameTime gameTime, MouseState mouseStateCurrent, MouseState mouseStatePrevious, Player player, BaseGameEntity crosshair, List<Wall> wallList)
-        {
-            //nodeNeedsUpdate = false;
-            
+        {           
             // pressing the left mouse button sets the start node
-            if (mouseStateCurrent.LeftButton == ButtonState.Pressed && mouseStatePrevious.LeftButton != ButtonState.Pressed)
+            /*if (mouseStateCurrent.LeftButton == ButtonState.Pressed && mouseStatePrevious.LeftButton != ButtonState.Pressed)
             {
                 foreach (Node node in NodeList)
                 {
-                    if (node.Cell.Contains(new Point((int)mouseStateCurrent.X, (int)mouseStateCurrent.Y)))
+                    if (node.Active && node.Cell.Contains(new Point((int)mouseStateCurrent.X, (int)mouseStateCurrent.Y)))
                     {
                         if (StartNode != null) 
                             StartNode.Color = Color.LightGray;
@@ -56,21 +54,27 @@ namespace SampleGame
                         nodeNeedsUpdate = true;
                     }
                 }
-            }
+            }*/
 
             // pressing the right mouse button sets the target node
             if (mouseStateCurrent.RightButton == ButtonState.Pressed && mouseStatePrevious.RightButton != ButtonState.Pressed)
             {
                 foreach (Node node in NodeList)
                 {
-                    if (node.Cell.Contains(new Point((int)mouseStateCurrent.X, (int)mouseStateCurrent.Y)))
+                    if (node.Active && node.Cell.Contains(new Point((int)player.Position.X, (int)player.Position.Y)))
+                    {
+                        StartNode = node;
+                        CurrentNode = StartNode;
+                    }
+
+                    if (node.Active && node.Cell.Contains(new Point((int)mouseStateCurrent.X, (int)mouseStateCurrent.Y)))
                     {
                         if (TargetNode != null)
                             TargetNode.Color = Color.LightGray;
                         TargetNode = node;
-                        nodeNeedsUpdate = true;
                     }
                 }
+                nodeNeedsUpdate = true;
             }
 
             // check to make sure the nodes exists before setting the color
@@ -92,7 +96,7 @@ namespace SampleGame
             //calculateAStar(StartNode, TargetNode);
 
             // run the A* algorithm
-            if (nodeNeedsUpdate && TargetNode != null && StartNode != null)
+            if (nodeNeedsUpdate && TargetNode != null && StartNode != null && StartNode != TargetNode)
                 calculateAStar();
 
             // ******************************** END A* ********************************* //
@@ -146,7 +150,7 @@ namespace SampleGame
                 if (CurrentNode == closedNode)
                     isOnClosedList = true;
             }
-
+            while (!found)
             calculatePath();      
         }
 
@@ -409,9 +413,6 @@ namespace SampleGame
 
         public virtual void Draw(SpriteBatch sprites, SpriteFont font1)
         {
-            if (StartNode != null && TargetNode != null)
-                DrawingHelper.DrawFastLine(StartNode.Position, TargetNode.Position, Color.White);
-
             if (found)
             {
                 Node node = TargetNode; // start at the final node and work back to the start
@@ -419,7 +420,7 @@ namespace SampleGame
                 {
                     DrawingHelper.DrawFastLine(node.Position, node.ParentNode.Position, Color.White);
                     node = node.ParentNode;
-                } while (node != null);
+                } while (node.ParentNode != null && node != null);
             }
         }
     }

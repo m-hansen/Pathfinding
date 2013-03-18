@@ -285,29 +285,44 @@ namespace SampleGame
                 spriteBatch.DrawString(font1, "Player Pos: " + player.Position.X + ", " + player.Position.Y, new Vector2(20, 20), Color.White, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 1);
                 spriteBatch.DrawString(font1, "Player Heading: " + player.Heading.X + ", " + player.Heading.Y, new Vector2(20, 40), Color.White, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 1);
 
+                // display info about the start node and its neighbors
+                if (navagationGraph.StartNode != null)
+                {
+                    text = "Start Node ID: " + navagationGraph.StartNode.id + "       Neighbors: ";
+                    foreach (Node adjNode in navagationGraph.StartNode.AdjacentNodes)
+                        text += adjNode.id + ", ";
+                    spriteBatch.DrawString(font1, text, new Vector2(20, 80), Color.White, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 1);
+                }
+
                 // display info about the current node and its neighbors
-                //text = "Current Node ID: " + navagationGraph.CurrentNode.id + "       Neighbors: ";
-                //foreach (Node adjNode in navagationGraph.CurrentNode.AdjacentNodes)
-                //    text += adjNode.id + ", ";
-                //spriteBatch.DrawString(font1, text, new Vector2(20, 80), Color.White, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 1);
+                if (navagationGraph.CurrentNode != null)
+                {
+                    text = "Current Node ID: " + navagationGraph.CurrentNode.id + "       Neighbors: ";
+                    foreach (Node adjNode in navagationGraph.CurrentNode.AdjacentNodes)
+                        text += adjNode.id + ", ";
+                    spriteBatch.DrawString(font1, text, new Vector2(20, 100), Color.White, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 1);
+                }
 
                 // display info about the target node and its neighbors
-                //text = "Target Node ID: " + navagationGraph.TargetNode.id + "       Neighbors: ";
-                //foreach (Node adjNode in navagationGraph.TargetNode.AdjacentNodes)
-                //    text += adjNode.id + ", ";
-                //spriteBatch.DrawString(font1, text, new Vector2(20, 100), Color.White, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 1);
+                if (navagationGraph.TargetNode != null)
+                {
+                    text = "Target Node ID: " + navagationGraph.TargetNode.id + "       Neighbors: ";
+                    foreach (Node adjNode in navagationGraph.TargetNode.AdjacentNodes)
+                        text += adjNode.id + ", ";
+                    spriteBatch.DrawString(font1, text, new Vector2(20, 120), Color.White, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 1);
+                }
 
                 // display information about the open list for A*
                 text = "Open List: ";
                 foreach (Node node in navagationGraph.OpenList)
                     text += node.id + ", ";
-                spriteBatch.DrawString(font1, text, new Vector2(20, 140), Color.White, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 1);
+                spriteBatch.DrawString(font1, text, new Vector2(20, 160), Color.White, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 1);
 
                 // display information about the closed list for A*
                 text = "Closed List: ";
                 foreach (Node node in navagationGraph.ClosedList)
                     text += node.id + ", ";
-                spriteBatch.DrawString(font1, text, new Vector2(20, 160), Color.White, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 1);
+                spriteBatch.DrawString(font1, text, new Vector2(20, 180), Color.White, 0.0f, Vector2.Zero, 0.75f, SpriteEffects.None, 1);
             }
 
             spriteBatch.End();
