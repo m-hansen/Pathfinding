@@ -133,9 +133,10 @@
     <Content Include="GameThumbnail.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SampleGameContent\SampleGameContent.contentproj">
-      <Name>SampleGameContent</Name>
+    <ProjectReference Include="..\PathfindingContent\PathfindingContent.contentproj">
+      <Name>PathfindingContent %28Content%29</Name>
       <XnaReferenceType>Content</XnaReferenceType>
+      <Project>{38CD712F-F59A-4815-A04A-D6D8C8E5690A}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
