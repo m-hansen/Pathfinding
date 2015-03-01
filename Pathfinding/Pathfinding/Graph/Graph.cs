@@ -136,8 +136,10 @@ namespace SampleGame
             // clear lists, reset node costs, and calculate heuristic values
             initializeAStar();
 
+            OpenList.Add(StartNode);
+
             // continue to calculate a path until the target is reached
-            while (!found)
+            while (OpenList.Any() && !found)
                 calculatePath();
 
             // add the path to a list of nodes (Note: nodes will be added in reverse order)
